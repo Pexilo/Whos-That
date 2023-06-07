@@ -4,6 +4,7 @@ import {
   Guild,
   ButtonBuilder,
   ActionRowBuilder,
+  ButtonInteraction,
 } from "discord.js";
 const { GuildData } = require("../db/index");
 
@@ -17,7 +18,7 @@ export function Wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function Defer(interaction: CommandInteraction) {
+export async function Defer(interaction: CommandInteraction | ButtonInteraction) {
   let bool = true;
   await interaction.deferReply({ ephemeral: true }).catch(() => {
     bool = false;
