@@ -14,7 +14,8 @@ type Guilds = {
   sourceChannel: string;
   pickerChannel: string;
   whosThatChannel: string;
-  checkpoints: [];
+  checkpoints: string[];
+  pickableUsers: string[];
 };
 
 const NumberToEmoji = [
@@ -33,16 +34,15 @@ const NumberToEmoji = [
 export const SendMessageToPickerChannel = async (client: ShewenyClient) => {
   const guilds = await GuildData.find();
   guilds.forEach(async (guild: Guilds) => {
-    console.log("l36");
     if (
       !guild.sourceChannel ||
       !guild.pickerChannel ||
       !guild.whosThatChannel ||
-      !guild.checkpoints
+      !guild.checkpoints ||
+      guild.pickableUsers.length < 1
     )
       return;
-    console.log("l44");
-    //fetch guild
+
     const currentGuild = await client.guilds.fetch(guild.id);
     const sourceChannel = (await client.channels.fetch(
       guild.sourceChannel
@@ -51,74 +51,99 @@ export const SendMessageToPickerChannel = async (client: ShewenyClient) => {
       guild.pickerChannel
     )) as TextChannel;
     if (!currentGuild) return;
-    console.log("l56");
 
-    try {
-      const randomCheckpoints = guild.checkpoints
-        .sort(() => Math.random() - 0.5)
-        .splice(0, 2);
+    const randomCheckpoints = guild.checkpoints
+      .sort(() => Math.random() - 0.5)
+      .splice(0, 2);
 
-      const randomMessages: Message<true>[] = [];
+    const randomMessages: Message<true>[] = [];
 
-      for (const checkpoint of randomCheckpoints) {
-        const msg = (
-          await FindMessagesFromCheckpoint(sourceChannel, checkpoint)
-        ).random(5);
-        randomMessages.push(...msg);
-      }
-
-      const randMessagesYears = GetMessageYears(randomMessages);
-
-      console.log("l73");
-      let buttons: ButtonBuilder[] = [];
-      randomMessages.map((message, i) => {
-        buttons.push(
-          new ButtonBuilder()
-            .setCustomId(`picker_${message.id}_${message.author.id}`)
-            .setStyle(ButtonStyle.Primary)
-            .setEmoji(`${NumberToEmoji[i]}`)
-        );
-      });
-
-      //send message to picker channel
-      pickerChannel.send({
-        embeds: [
-          Embed()
-            .setTitle("Who's that?")
-            .setDescription(
-              `Pick the message to send to <#${guild.whosThatChannel}>`
-            )
-            .addFields(
-              randomMessages.map((message, i) => {
-                return {
-                  name: `${NumberToEmoji[i]}`,
-                  value: message.content,
-                };
-              })
-            )
-            .setFooter({
-              text: `from ${randMessagesYears}`,
-              iconURL: client.user?.displayAvatarURL(),
-            }),
-        ],
-        components: [
-          {
-            type: 1,
-            components: buttons.slice(0, 5),
-          },
-          {
-            type: 1,
-            components: buttons.slice(5, buttons.length),
-          },
-        ],
-      });
-    } catch (err) {
-      SendMessageToPickerChannel(client);
+    for (const checkpoint of randomCheckpoints) {
+      const msg = (
+        await FindMessagesFromCheckpoint(sourceChannel, checkpoint, guild)
+      ).random(5);
+      randomMessages.push(...msg);
     }
+
+    const randMessagesYears = GetMessageYears(randomMessages);
+
+    let buttons: ButtonBuilder[] = [];
+    randomMessages.map((message, i) => {
+      buttons.push(
+        new ButtonBuilder()
+          .setCustomId(`picker_${message.id}_${message.author.id}`)
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji(`${NumberToEmoji[i]}`)
+      );
+    });
+
+    //send message to picker channel
+    pickerChannel.send({
+      embeds: [
+        Embed()
+          .setTitle("Who's that?")
+          .setDescription(
+            `Pick the message to send to <#${guild.whosThatChannel}>`
+          )
+          .addFields(
+            randomMessages.map((message, i) => {
+              return {
+                name: `${NumberToEmoji[i]}`,
+                value: message.content,
+              };
+            })
+          )
+          .setFooter({
+            text: `from ${randMessagesYears}`,
+            iconURL: client.user?.displayAvatarURL(),
+          })
+          .setTimestamp(),
+      ],
+      components: [
+        {
+          type: 1,
+          components:
+            buttons.length >= 5
+              ? buttons.slice(0, 5)
+              : [
+                  new ButtonBuilder()
+                    .setCustomId("button-disable2")
+                    .setEmoji("❌")
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(true),
+                ],
+        },
+        {
+          type: 1,
+          components:
+            buttons.length > 5
+              ? buttons.slice(5, buttons.length)
+              : [
+                  new ButtonBuilder()
+                    .setCustomId("button-disable1")
+                    .setEmoji("❌")
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(true),
+                ],
+        },
+        {
+          type: 1,
+          components: [
+            new ButtonBuilder()
+              .setCustomId(`picker_refresh`)
+              .setStyle(ButtonStyle.Secondary)
+              .setEmoji("🔁"),
+          ],
+        },
+      ],
+    });
   });
 };
 
-async function SortMessages(randomMessages: Collection<string, Message<true>>) {
+async function SortMessages(
+  randomMessages: Collection<string, Message<true>>,
+  guild: Guilds
+) {
   const randomMessagesWithoutEmbeds = new Collection<string, Message<true>>();
 
   for (const message of randomMessages.values()) {
@@ -127,10 +152,11 @@ async function SortMessages(randomMessages: Collection<string, Message<true>>) {
       !message.attachments.size &&
       !message.content.includes("http") &&
       message.content.length > 15 &&
-      !message.content.startsWith("<") &&
-      !message.content.endsWith(">") &&
+      !message.content.includes("<") &&
+      !message.content.includes(">") &&
       !message.content.startsWith(":") &&
-      !message.content.endsWith(":")
+      !message.content.endsWith(":") &&
+      guild.pickableUsers.includes(message.author.id)
     ) {
       randomMessagesWithoutEmbeds.set(message.id, message);
     }
@@ -141,13 +167,14 @@ async function SortMessages(randomMessages: Collection<string, Message<true>>) {
 
 async function FindMessagesFromCheckpoint(
   sourceChannel: TextChannel,
-  randomCheckpoint: string
+  randomCheckpoint: string,
+  guild: Guilds
 ) {
   const messagesFromCheckpoint = await sourceChannel.messages.fetch({
     limit: 100,
     after: randomCheckpoint,
   });
-  const randomMessages = await SortMessages(messagesFromCheckpoint);
+  const randomMessages = await SortMessages(messagesFromCheckpoint, guild);
 
   return randomMessages;
 }

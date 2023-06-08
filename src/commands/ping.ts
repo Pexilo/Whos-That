@@ -7,7 +7,7 @@ export class Ping extends Command {
   constructor(client: ShewenyClient) {
     super(client, {
       name: "ping",
-      description: "Ping Pong",
+      description: "🏓 Show the bot latency",
       category: "Misc",
       cooldown: 3,
       clientPermissions: ["EmbedLinks"],

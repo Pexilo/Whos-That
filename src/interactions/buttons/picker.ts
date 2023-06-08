@@ -1,12 +1,16 @@
 import { Button } from "sheweny";
 import type { ShewenyClient } from "sheweny";
-import type {
+import {
+  ActionRowBuilder,
   AttachmentBuilder,
   ButtonInteraction,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
   TextChannel,
 } from "discord.js";
 import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
 import GenerateDiscordMessage from "@utils/generate-image";
+import { SendMessageToPickerChannel } from "src/sender";
 
 export class WhosThatMesageListener extends Button {
   constructor(client: ShewenyClient) {
@@ -22,6 +26,14 @@ export class WhosThatMesageListener extends Button {
       return button.editReply({
         content: "An error occured. Could not fetch guild data.",
       });
+
+    //Refresh button
+    if (button.customId === "picker_refresh") {
+      SendMessageToPickerChannel(this.client);
+      return button.editReply({
+        content: "🔁 Picker refreshed.",
+      });
+    }
 
     const messageId = button.customId.split("_")[1];
     //const authorId = button.customId.split("_")[2];
@@ -54,11 +66,29 @@ export class WhosThatMesageListener extends Button {
       .setImage(`attachment://${attachment.name}`);
     if (content.length > 150) embed.setDescription(content);
 
-    whosThatChannel.send({
-      embeds: [embed],
-      files: [attachment],
-    });
+    const select =
+      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId("starter")
+          .setPlaceholder("Make a selection!")
+          .addOptions(
+            new StringSelectMenuOptionBuilder()
+              .setLabel("Bulbasaur")
+              .setDescription("The dual-type Grass/Poison Seed Pokémon.")
+              .setValue("bulbasaur")
+          )
+      );
 
-    if (!guildData) return;
+    await whosThatChannel
+      .send({
+        embeds: [embed],
+        files: [attachment],
+        components: [select],
+      })
+      .then(async (msg) => {
+        button.editReply({
+          content: `✅ Message sent ${msg.url}`,
+        });
+      });
   }
 }

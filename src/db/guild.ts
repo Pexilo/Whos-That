@@ -1,8 +1,12 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const guildSchema = new mongoose.Schema({
   id: String,
   checkpoints: {
+    type: Array,
+    default: [],
+  },
+  pickableUsers: {
     type: Array,
     default: [],
   },
@@ -11,4 +15,4 @@ const guildSchema = new mongoose.Schema({
   whosThatChannel: String,
 });
 
-module.exports = mongoose.model("Guild", guildSchema);
+export default mongoose.model("Guild", guildSchema);

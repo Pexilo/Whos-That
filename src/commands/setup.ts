@@ -7,6 +7,7 @@ import {
   ApplicationCommandOptionType,
   TextChannel,
 } from "discord.js";
+import SelectUsers from "@utils/select-users";
 
 export class WhosThatSetupCommand extends Command {
   constructor(client: ShewenyClient) {
@@ -65,8 +66,10 @@ export class WhosThatSetupCommand extends Command {
       whosThatChannel: whosThatChannel.id,
     });
 
-    interaction.editReply({
-      content: `✅ **WhosThat** is now setup to send messages in <#${whosThatChannel.id}>.`,
-    });
+    const GuildMembers = guild!.members.cache
+      .filter((member) => !member.user.bot)
+      .map((member) => member);
+
+    SelectUsers(GuildMembers, interaction);
   }
 }
