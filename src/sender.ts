@@ -9,7 +9,6 @@ import {
 import { ShewenyClient } from "sheweny";
 const { GuildData } = require("./db/index");
 
-
 type Guilds = {
   id: string;
   sourceChannel: string;
@@ -18,46 +17,43 @@ type Guilds = {
   checkpoints: [];
 };
 
-module.exports = (client: ShewenyClient) => {
-  const NumberToEmoji = [
-    "1️⃣",
-    "2️⃣",
-    "3️⃣",
-    "4️⃣",
-    "5️⃣",
-    "6️⃣",
-    "7️⃣",
-    "8️⃣",
-    "9️⃣",
-    "🔟",
-  ];
+const NumberToEmoji = [
+  "1️⃣",
+  "2️⃣",
+  "3️⃣",
+  "4️⃣",
+  "5️⃣",
+  "6️⃣",
+  "7️⃣",
+  "8️⃣",
+  "9️⃣",
+  "🔟",
+];
 
-  (async () => {
-    const guilds = await GuildData.find();
-    guilds.forEach(async (guild: Guilds) => {
-      console.log("l36");
-      if (
-        !guild.sourceChannel ||
-        !guild.pickerChannel ||
-        !guild.whosThatChannel ||
-        !guild.checkpoints
-      )
-        return;
-      console.log("l44")
-      //fetch guild 
-      const currentGuild = await client.guilds.fetch(guild.id);
-      const sourceChannel = await client.channels.fetch(
-        guild.sourceChannel
-      ) as TextChannel;
-      const pickerChannel = await currentGuild.channels.fetch(
-        guild.pickerChannel
-      ) as TextChannel;
-      if (
-        !currentGuild
-      )
-        return;
-      console.log("l56")
+export const SendMessageToPickerChannel = async (client: ShewenyClient) => {
+  const guilds = await GuildData.find();
+  guilds.forEach(async (guild: Guilds) => {
+    console.log("l36");
+    if (
+      !guild.sourceChannel ||
+      !guild.pickerChannel ||
+      !guild.whosThatChannel ||
+      !guild.checkpoints
+    )
+      return;
+    console.log("l44");
+    //fetch guild
+    const currentGuild = await client.guilds.fetch(guild.id);
+    const sourceChannel = (await client.channels.fetch(
+      guild.sourceChannel
+    )) as TextChannel;
+    const pickerChannel = (await currentGuild.channels.fetch(
+      guild.pickerChannel
+    )) as TextChannel;
+    if (!currentGuild) return;
+    console.log("l56");
 
+    try {
       const randomCheckpoints = guild.checkpoints
         .sort(() => Math.random() - 0.5)
         .splice(0, 2);
@@ -71,7 +67,7 @@ module.exports = (client: ShewenyClient) => {
         randomMessages.push(...msg);
       }
 
-      const randMessagesYears = GetMessageYears(randomMessages)
+      const randMessagesYears = GetMessageYears(randomMessages);
 
       console.log("l73");
       let buttons: ButtonBuilder[] = [];
@@ -89,20 +85,21 @@ module.exports = (client: ShewenyClient) => {
         embeds: [
           Embed()
             .setTitle("Who's that?")
-            .setDescription(`Pick the message to send to <#${guild.whosThatChannel}>`)
+            .setDescription(
+              `Pick the message to send to <#${guild.whosThatChannel}>`
+            )
             .addFields(
               randomMessages.map((message, i) => {
                 return {
                   name: `${NumberToEmoji[i]}`,
                   value: message.content,
                 };
-              }
-              )
+              })
             )
             .setFooter({
               text: `from ${randMessagesYears}`,
               iconURL: client.user?.displayAvatarURL(),
-            })
+            }),
         ],
         components: [
           {
@@ -115,10 +112,11 @@ module.exports = (client: ShewenyClient) => {
           },
         ],
       });
-    });
-  })();
+    } catch (err) {
+      SendMessageToPickerChannel(client);
+    }
+  });
 };
-
 
 async function SortMessages(randomMessages: Collection<string, Message<true>>) {
   const randomMessagesWithoutEmbeds = new Collection<string, Message<true>>();
@@ -129,7 +127,10 @@ async function SortMessages(randomMessages: Collection<string, Message<true>>) {
       !message.attachments.size &&
       !message.content.includes("http") &&
       message.content.length > 15 &&
-      (!message.content.startsWith("<") && !message.content.endsWith(">")) && (!message.content.startsWith(":") && (!message.content.endsWith(":")))
+      !message.content.startsWith("<") &&
+      !message.content.endsWith(">") &&
+      !message.content.startsWith(":") &&
+      !message.content.endsWith(":")
     ) {
       randomMessagesWithoutEmbeds.set(message.id, message);
     }
@@ -152,14 +153,12 @@ async function FindMessagesFromCheckpoint(
 }
 
 function GetMessageYears(messages: Message<true>[]) {
-  let years: number[] = []
+  let years: number[] = [];
   for (const message of messages) {
-    let year = new Date(
-      message.createdTimestamp
-    ).getFullYear()
+    let year = new Date(message.createdTimestamp).getFullYear();
     if (!years.includes(year)) {
-      years.push(year)
+      years.push(year);
     }
   }
-  return years
+  return years;
 }

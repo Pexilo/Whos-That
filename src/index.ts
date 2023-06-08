@@ -59,7 +59,7 @@ mongoose
   .then(() => console.log("✅ MongoDB"))
   .catch((err: Error) => console.error("❌ MongoDB\n", err.reason));
 
-const Sender = require("./sender");
-Sender(client);
+import { SendMessageToPickerChannel } from "./sender";
+SendMessageToPickerChannel(client);
 
 client.login(config.DISCORD_TOKEN);

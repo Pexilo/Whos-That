@@ -27,8 +27,11 @@ export async function Defer(interaction: CommandInteraction | ButtonInteraction)
   return bool;
 }
 
+export function Truncate(str: string, max: number) {
+  return str.length > max ? str.substring(0, max - 1) + "..." : str;
+}
+
 export function CreateButtons(buttons: any[]) {
-  // limit to 5 buttons per row
   let buttonRow = new ActionRowBuilder<ButtonBuilder>();
   for (const button of buttons) {
     buttonRow.addComponents(
