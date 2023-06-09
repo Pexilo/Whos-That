@@ -96,7 +96,7 @@ export class WhosThatMesageListener extends Button {
               new StringSelectMenuOptionBuilder()
                 .setLabel(m.displayName)
                 .setValue(m.id)
-                .setDescription(m.user.tag)
+                .setDescription(m.user.username)
             )
           )
       );

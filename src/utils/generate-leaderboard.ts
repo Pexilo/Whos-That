@@ -80,7 +80,7 @@ async function GetLeaderboard(
             i: number
           ) =>
             `${i < 3 ? rankEmoji[i] : user.index + "."} **${
-              user.user?.user.tag
+              user.user?.user
             }** — \`${user.points}\` points ${
               user.whosThatResponded.length > 0 &&
               user.whosThatResponded[0].correct
