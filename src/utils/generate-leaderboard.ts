@@ -27,8 +27,6 @@ async function GetLeaderboard(
       user.user?.id === interaction.user.id
   );
 
-  console.log(user?.whosThatResponded[0].correct);
-
   if (!user)
     return interaction.editReply({
       content: "An error occured. Could not fetch user.",
