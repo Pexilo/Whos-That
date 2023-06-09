@@ -2,15 +2,15 @@ import { Button } from "sheweny";
 import type { ShewenyClient } from "sheweny";
 import {
   ActionRowBuilder,
-  AttachmentBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   TextChannel,
 } from "discord.js";
-import { Defer, Embed, FetchGuild, UpdateGuild } from "@utils/shortcuts";
+import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
 import GenerateDiscordMessage from "@utils/generate-image";
 import { SendMessageToPickerChannel } from "src/sender";
+import IGuild from "@models/IGuild";
 
 export class WhosThatMesageListener extends Button {
   constructor(client: ShewenyClient) {
@@ -21,7 +21,7 @@ export class WhosThatMesageListener extends Button {
     if (!(await Defer(button))) return;
 
     const { guild } = button;
-    const guildData = await FetchGuild(guild!);
+    const guildData: IGuild = await FetchGuild(guild!);
     if (!guildData)
       return button.editReply({
         content: "An error occured. Could not fetch guild data.",
@@ -72,7 +72,6 @@ export class WhosThatMesageListener extends Button {
 
     userToPick.push(authorId);
     userToPick.sort(() => Math.random() - 0.5);
-    console.log("🚀 ~ userToPick:", userToPick);
 
     const GuildMembers = guild!.members.cache
       .filter((m) => userToPick.includes(m.id))

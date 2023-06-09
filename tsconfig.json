@@ -1,9 +1,7 @@
 {
   "version": "2.4.2",
   "compilerOptions": {
-    "lib": [
-      "ES2021"
-    ],
+    "lib": ["ES2021"],
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -22,27 +20,15 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@images/*": [
-        "src/images/*"
-      ],
-      "@rootDir": [
-        "./"
-      ]
+      "@utils/*": ["src/utils/*"],
+      "@images/*": ["src/images/*"],
+      "@models/*": ["src/models/*"],
+      "@rootDir": ["./"]
     }
   },
   "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ]
+    "require": ["tsconfig-paths/register"]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "cli-config.ts"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "cli-config.ts"]
 }

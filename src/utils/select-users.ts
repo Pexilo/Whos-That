@@ -9,12 +9,13 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { FetchGuild } from "./shortcuts";
+import IGuild from "@models/IGuild";
 
 export default async function SelectUsers(
   members: GuildMember[],
   interaction: CommandInteraction
 ) {
-  const guildData = await FetchGuild(interaction.guild!);
+  const guildData: IGuild = await FetchGuild(interaction.guild!);
   //Users per page (max 25)
   const usersPerPage = 25;
 

@@ -7,16 +7,8 @@ import {
   TextChannel,
 } from "discord.js";
 import { ShewenyClient } from "sheweny";
+import IGuild from "@models/IGuild";
 const { GuildData } = require("./db/index");
-
-type Guilds = {
-  id: string;
-  sourceChannel: string;
-  pickerChannel: string;
-  whosThatChannel: string;
-  checkpoints: string[];
-  pickableUsers: string[];
-};
 
 const NumberToEmoji = [
   "1️⃣",
@@ -33,7 +25,7 @@ const NumberToEmoji = [
 
 export const SendMessageToPickerChannel = async (client: ShewenyClient) => {
   const guilds = await GuildData.find();
-  guilds.forEach(async (guild: Guilds) => {
+  guilds.forEach(async (guild: IGuild) => {
     if (
       !guild.sourceChannel ||
       !guild.pickerChannel ||
@@ -142,7 +134,7 @@ export const SendMessageToPickerChannel = async (client: ShewenyClient) => {
 
 async function SortMessages(
   randomMessages: Collection<string, Message<true>>,
-  guild: Guilds
+  guild: IGuild
 ) {
   const randomMessagesWithoutEmbeds = new Collection<string, Message<true>>();
 
@@ -168,7 +160,7 @@ async function SortMessages(
 async function FindMessagesFromCheckpoint(
   sourceChannel: TextChannel,
   randomCheckpoint: string,
-  guild: Guilds
+  guild: IGuild
 ) {
   const messagesFromCheckpoint = await sourceChannel.messages.fetch({
     limit: 100,

@@ -2,6 +2,7 @@ import { Defer, FetchGuild, FetchUser, UpdateUser } from "@utils/shortcuts";
 import { StringSelectMenuInteraction, TextChannel } from "discord.js";
 import { SelectMenu } from "sheweny";
 import type { ShewenyClient } from "sheweny";
+import IGuild from "@models/IGuild";
 
 export class WhosThatSelect extends SelectMenu {
   constructor(client: ShewenyClient) {
@@ -18,7 +19,7 @@ export class WhosThatSelect extends SelectMenu {
     if (!authorId || !messageId) return;
 
     const userData = await FetchUser(selectMenu.user.id);
-    const guildData = await FetchGuild(guild!);
+    const guildData: IGuild = await FetchGuild(guild!);
     if (!guildData || !userData) return;
 
     const sourceChannel = (await guild!.channels.fetch(
@@ -62,7 +63,7 @@ export class WhosThatSelect extends SelectMenu {
       });
 
       return selectMenu.editReply({
-        content: `⛔ Mauvaise réponse !\nLa réponse était <@${authorId}> !${
+        content: `⛔ Mauvaise réponse !\nLa réponse était <@${authorId}> ! ${
           message.url
         }\n\n> \`+1\` point de participation\n> Total: \`${
           userData!.points + 1

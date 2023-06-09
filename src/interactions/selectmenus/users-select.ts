@@ -1,12 +1,8 @@
-import {
-  FetchGuild,
-  FetchUser,
-  UpdateGuild,
-  UpdateUser,
-} from "@utils/shortcuts";
+import { FetchGuild, FetchUser, UpdateGuild } from "@utils/shortcuts";
 import { StringSelectMenuInteraction } from "discord.js";
 import { SelectMenu } from "sheweny";
 import type { ShewenyClient } from "sheweny";
+import IGuild from "@models/IGuild";
 
 export class UserSelect extends SelectMenu {
   constructor(client: ShewenyClient) {
@@ -18,7 +14,7 @@ export class UserSelect extends SelectMenu {
 
     selectMenu.deferUpdate();
 
-    const guildData = await FetchGuild(guild!);
+    const guildData: IGuild = await FetchGuild(guild!);
     values.forEach(async (element) => {
       await FetchUser(element);
     });
