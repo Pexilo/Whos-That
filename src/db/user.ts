@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  lastWhosThatResponse: String,
 });
 
 export default mongoose.model("User", userSchema);

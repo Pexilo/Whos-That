@@ -8,7 +8,7 @@ import {
   StringSelectMenuOptionBuilder,
   TextChannel,
 } from "discord.js";
-import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
+import { Defer, Embed, FetchGuild, UpdateGuild } from "@utils/shortcuts";
 import GenerateDiscordMessage from "@utils/generate-image";
 import { SendMessageToPickerChannel } from "src/sender";
 
@@ -36,7 +36,7 @@ export class WhosThatMesageListener extends Button {
     }
 
     const messageId = button.customId.split("_")[1];
-    //const authorId = button.customId.split("_")[2];
+    const authorId = button.customId.split("_")[2];
 
     const sourceChannel = (await guild!.channels.fetch(
       guildData.sourceChannel
@@ -66,16 +66,31 @@ export class WhosThatMesageListener extends Button {
       .setImage(`attachment://${attachment.name}`);
     if (content.length > 150) embed.setDescription(content);
 
+    const userToPick = guildData.pickableUsers
+      .filter((u: string) => u !== authorId)
+      .slice(0, 4);
+
+    userToPick.push(authorId);
+    userToPick.sort(() => Math.random() - 0.5);
+    console.log("🚀 ~ userToPick:", userToPick);
+
+    const GuildMembers = guild!.members.cache
+      .filter((m) => userToPick.includes(m.id))
+      .map((m) => m);
+    GuildMembers.sort(() => Math.random() - 0.5);
+
     const select =
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
-          .setCustomId("starter")
-          .setPlaceholder("Make a selection!")
+          .setCustomId(`whosthat-select_${authorId}_${messageId}`)
+          .setPlaceholder("C'est qui ?")
           .addOptions(
-            new StringSelectMenuOptionBuilder()
-              .setLabel("Bulbasaur")
-              .setDescription("The dual-type Grass/Poison Seed Pokémon.")
-              .setValue("bulbasaur")
+            GuildMembers.map((m) =>
+              new StringSelectMenuOptionBuilder()
+                .setLabel(m.displayName)
+                .setValue(m.id)
+                .setDescription(m.user.tag)
+            )
           )
       );
 

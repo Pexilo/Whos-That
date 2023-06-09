@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
   ActionRowBuilder,
   ButtonInteraction,
+  StringSelectMenuInteraction,
 } from "discord.js";
 const { UserData } = require("../db/index");
 const { GuildData } = require("../db/index");
@@ -20,7 +21,10 @@ export function Wait(ms: number) {
 }
 
 export async function Defer(
-  interaction: CommandInteraction | ButtonInteraction
+  interaction:
+    | CommandInteraction
+    | ButtonInteraction
+    | StringSelectMenuInteraction
 ) {
   let bool = true;
   await interaction.deferReply({ ephemeral: true }).catch(() => {
