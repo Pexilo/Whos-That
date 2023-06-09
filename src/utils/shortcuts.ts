@@ -98,6 +98,11 @@ export async function FetchUser(userId: string, guild: Guild) {
   return data;
 }
 
+export async function FetchUsersFromGuild(guild: Guild) {
+  const data = await UserData.find({ guilds: guild.id });
+  return data;
+}
+
 export async function UpdateGuild(guild: Guild, data: any) {
   const guildData = await FetchGuild(guild);
   if (typeof data !== "object") return;

@@ -2,7 +2,9 @@ import { Button } from "sheweny";
 import type { ShewenyClient } from "sheweny";
 import {
   ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
+  ButtonStyle,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   TextChannel,
@@ -11,7 +13,7 @@ import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
 import GenerateDiscordMessage from "@utils/generate-image";
 import { SendMessageToPickerChannel } from "src/sender";
 import IGuild from "@models/IGuild";
-const { rando, randoSequence } = require("@nastyox/rando.js");
+const { randoSequence } = require("@nastyox/rando.js");
 
 export class WhosThatMesageListener extends Button {
   constructor(client: ShewenyClient) {
@@ -99,11 +101,19 @@ export class WhosThatMesageListener extends Button {
           )
       );
 
+    const leaderboardBtn = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`whosthat-leaderboard_${messageId}`)
+        .setLabel("Classement")
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji("🏆")
+    );
+
     await whosThatChannel
       .send({
         embeds: [embed],
         files: [attachment],
-        components: [select],
+        components: [select, leaderboardBtn],
       })
       .then(async (msg) => {
         button.editReply({
