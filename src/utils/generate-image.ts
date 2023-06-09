@@ -20,8 +20,6 @@ async function GenerateDiscordMessage(message: Message) {
   const canvas = createCanvas(800, 300);
   const ctx = canvas.getContext("2d");
 
-  console.log(GlobalFonts.families);
-
   //Load background
   const background = await loadImage(
     "src/assets/discord_message_bg-darker.png"
