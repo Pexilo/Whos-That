@@ -12,9 +12,15 @@ async function GenerateDiscordMessage(message: Message) {
   }-${date.getDate()}`;
   const fileName = `${dateStr}_${message.id}.png`;
 
-  GlobalFonts.registerFromPath("src/assets/whosthatfix.ttf", "WhosThat");
+  GlobalFonts.registerFromPath("src/assets/ggsans-Normal.ttf", "GGSans");
+  GlobalFonts.registerFromPath(
+    "src/assets/NotoColorEmoji-Regular.ttf",
+    "NotoEmoji"
+  );
   const canvas = createCanvas(800, 300);
   const ctx = canvas.getContext("2d");
+
+  console.log(GlobalFonts.families);
 
   //Load background
   const background = await loadImage(
@@ -25,7 +31,7 @@ async function GenerateDiscordMessage(message: Message) {
   //Text
   ctx.strokeStyle = "#2b2d31";
   ctx.strokeRect(0, 0, canvas.width, canvas.height);
-  ctx.font = "30px WhosThat";
+  ctx.font = "30px 'GGSans', 'NotoEmoji'";
   ctx.fillStyle = "#ffffff";
   ctx.fillText("Utilisateur", 200, 105);
   ctx.fillStyle = "#e4e6e8";

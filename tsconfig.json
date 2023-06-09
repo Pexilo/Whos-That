@@ -23,6 +23,7 @@
       "@utils/*": ["src/utils/*"],
       "@images/*": ["src/images/*"],
       "@models/*": ["src/models/*"],
+      "@assets/*": ["src/assets/*"],
       "@rootDir": ["./"]
     }
   },
