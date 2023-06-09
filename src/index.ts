@@ -2,7 +2,7 @@ import { ShewenyClient } from "sheweny";
 import { IntentsBitField, PermissionFlagsBits, Partials } from "discord.js";
 const { mongoose } = require("mongoose");
 import config from "./config";
-import GenerateDiscordMessage from "@utils/generate-image";
+import { ScheduleFunction } from "@utils/shortcuts";
 
 interface Error {
   reason?: string;
@@ -59,7 +59,6 @@ mongoose
   .then(() => console.log("✅ MongoDB"))
   .catch((err: Error) => console.error("❌ MongoDB\n", err.reason));
 
-import { SendMessageToPickerChannel } from "./sender";
-SendMessageToPickerChannel(client);
+ScheduleFunction(client);
 
 client.login(config.DISCORD_TOKEN);

@@ -3,6 +3,7 @@ import { StringSelectMenuInteraction, TextChannel } from "discord.js";
 import { SelectMenu } from "sheweny";
 import type { ShewenyClient } from "sheweny";
 import IGuild from "@models/IGuild";
+import IWTRes from "@models/IWTRes";
 
 export class WhosThatSelect extends SelectMenu {
   constructor(client: ShewenyClient) {
@@ -18,7 +19,7 @@ export class WhosThatSelect extends SelectMenu {
     const messageId = selectMenu.customId.split("_")[2];
     if (!authorId || !messageId) return;
 
-    const userData = await FetchUser(selectMenu.user.id);
+    const userData = await FetchUser(selectMenu.user.id, guild!);
     const guildData: IGuild = await FetchGuild(guild!);
     if (!guildData || !userData) return;
 
@@ -36,17 +37,24 @@ export class WhosThatSelect extends SelectMenu {
         content: "An error occured. Could not fetch message.",
       });
 
-    if (userData.lastWhosThatResponse === messageId)
+    const messageAlreadyResponded = userData.whosThatResponded.find(
+      (r: IWTRes) => r.id === messageId
+    );
+    if (messageAlreadyResponded && messageAlreadyResponded.id === messageId)
       return selectMenu.editReply({
         content: `⛔ Vous avez déjà répondu aujourd'hui !\nLa réponse était <@${authorId}> ! ${message.url}\n\n> Points: \`${userData.points}\` points`,
       });
 
-    await UpdateUser(user.id, {
-      lastWhosThatResponse: messageId,
+    const whosthatRes = [
+      ...userData.whosThatResponded,
+      { id: messageId, correct: authorId === values[0] },
+    ];
+    await UpdateUser(user.id, guild!, {
+      whosThatResponded: whosthatRes,
     });
 
     if (authorId === values[0]) {
-      await UpdateUser(user.id, {
+      await UpdateUser(user.id, guild!, {
         points: userData!.points + 2,
       });
 
@@ -58,7 +66,7 @@ export class WhosThatSelect extends SelectMenu {
         }\` points`,
       });
     } else {
-      await UpdateUser(user.id, {
+      await UpdateUser(user.id, guild!, {
         points: userData!.points + 1,
       });
 

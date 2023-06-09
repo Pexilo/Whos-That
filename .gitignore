@@ -12,3 +12,4 @@ dist/
 .vscode/settings.json
 src/assets/ggsans-Normal.ttf
 src/history/*
+.env.save

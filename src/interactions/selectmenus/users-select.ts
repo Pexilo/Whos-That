@@ -16,7 +16,7 @@ export class UserSelect extends SelectMenu {
 
     const guildData: IGuild = await FetchGuild(guild!);
     values.forEach(async (element) => {
-      await FetchUser(element);
+      await FetchUser(element, guild!);
     });
 
     const users = guildData!.pickableUsers;

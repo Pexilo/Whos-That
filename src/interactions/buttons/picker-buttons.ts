@@ -11,6 +11,7 @@ import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
 import GenerateDiscordMessage from "@utils/generate-image";
 import { SendMessageToPickerChannel } from "src/sender";
 import IGuild from "@models/IGuild";
+const { rando, randoSequence } = require("@nastyox/rando.js");
 
 export class WhosThatMesageListener extends Button {
   constructor(client: ShewenyClient) {
@@ -66,12 +67,17 @@ export class WhosThatMesageListener extends Button {
       .setImage(`attachment://${attachment.name}`);
     if (content.length > 150) embed.setDescription(content);
 
-    const userToPick = guildData.pickableUsers
-      .filter((u: string) => u !== authorId)
-      .slice(0, 4);
+    let userToPick = guildData.pickableUsers.filter(
+      (u: string) => u !== authorId
+    );
 
+    userToPick = randoSequence(userToPick)
+      .map((item: { value: any }) => item.value)
+      .slice(0, 4);
     userToPick.push(authorId);
-    userToPick.sort(() => Math.random() - 0.5);
+    userToPick = randoSequence(userToPick).map(
+      (item: { value: any }) => item.value
+    );
 
     const GuildMembers = guild!.members.cache
       .filter((m) => userToPick.includes(m.id))

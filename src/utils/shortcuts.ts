@@ -7,6 +7,8 @@ import {
   ButtonInteraction,
   StringSelectMenuInteraction,
 } from "discord.js";
+import { ShewenyClient } from "sheweny";
+import { SendMessageToPickerChannel } from "../sender";
 const { UserData } = require("../db/index");
 const { GuildData } = require("../db/index");
 
@@ -63,8 +65,8 @@ export async function CreateGuild(guild: Guild) {
     );
 }
 
-export async function CreateUser(userId: string) {
-  const userData = new UserData({ id: userId });
+export async function CreateUser(userId: string, guild: Guild) {
+  const userData = new UserData({ id: userId, guilds: [guild.id] });
   userData.save();
 }
 
@@ -86,9 +88,13 @@ export async function FetchGuild(guild: Guild) {
   return data;
 }
 
-export async function FetchUser(userId: string) {
+export async function FetchUser(userId: string, guild: Guild) {
   const data = await UserData.findOne({ id: userId });
-  if (!data) await CreateUser(userId);
+  if (!data) await CreateUser(userId, guild);
+  if (!data.guilds.includes(guild.id)) {
+    data.guilds.push(guild.id);
+    data.save();
+  }
   return data;
 }
 
@@ -101,11 +107,23 @@ export async function UpdateGuild(guild: Guild, data: any) {
   return guildData.save();
 }
 
-export async function UpdateUser(userId: string, data: any) {
-  const userData = await FetchUser(userId);
+export async function UpdateUser(userId: string, guild: Guild, data: any) {
+  const userData = await FetchUser(userId, guild);
   if (typeof data !== "object") return;
   for (const key in data) {
     if (userData[key] !== data[key]) userData[key] = data[key];
   }
   return userData.save();
+}
+
+export function ScheduleFunction(client: ShewenyClient) {
+  setInterval(function () {
+    var currentDate = new Date();
+    if (
+      currentDate.getHours() === (10 || 14) &&
+      currentDate.getMinutes() === 0
+    ) {
+      SendMessageToPickerChannel(client);
+    }
+  }, 60 * 60 * 1000);
 }

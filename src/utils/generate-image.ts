@@ -12,7 +12,7 @@ async function GenerateDiscordMessage(message: Message) {
   }-${date.getDate()}`;
   const fileName = `${dateStr}_${message.id}.png`;
 
-  GlobalFonts.registerFromPath("src/assets/whosthat.ttf", "WhosThat");
+  GlobalFonts.registerFromPath("src/assets/whosthatfix.ttf", "WhosThat");
   const canvas = createCanvas(800, 300);
   const ctx = canvas.getContext("2d");
 
