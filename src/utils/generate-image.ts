@@ -2,6 +2,7 @@ import { GlobalFonts } from "@napi-rs/canvas";
 import { AttachmentBuilder, Message } from "discord.js";
 import { join } from "path";
 import { Truncate } from "./shortcuts";
+import Vibrant = require("node-vibrant");
 
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 
@@ -19,6 +20,13 @@ async function GenerateDiscordMessage(message: Message) {
   );
   const canvas = createCanvas(800, 300);
   const ctx = canvas.getContext("2d");
+  const avatarPath = GetRandomUserAvatar();
+
+  // Color analysis
+  let userNameHex: string | undefined = "#2b2d31";
+  await Vibrant.from(avatarPath).getPalette(
+    (err, palette) => (userNameHex = palette?.Vibrant?.hex)
+  );
 
   //Load background
   const background = await loadImage(
@@ -30,7 +38,7 @@ async function GenerateDiscordMessage(message: Message) {
   ctx.strokeStyle = "#2b2d31";
   ctx.strokeRect(0, 0, canvas.width, canvas.height);
   ctx.font = "30px 'GGSans', 'NotoEmoji'";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = userNameHex;
   ctx.fillText("Utilisateur", 200, 105);
   ctx.fillStyle = "#e4e6e8";
   ctx.fillText(
@@ -39,8 +47,17 @@ async function GenerateDiscordMessage(message: Message) {
     0
   );
 
+  //Date
+  const msgDate = new Date(message.createdTimestamp);
+  const dateDDMMYYYY = `${msgDate.getDate()}/${
+    msgDate.getMonth() + 1
+  }/${msgDate.getFullYear()} ${msgDate.getHours()}:${msgDate.getMinutes()}`;
+  ctx.font = "20px 'GGSans', 'NotoEmoji'";
+  ctx.fillStyle = "#b9bbbe";
+  ctx.fillText(dateDDMMYYYY, 350, 105);
+
   //User avatar
-  const avatar = await loadImage("src/assets/user_avatar.png");
+  const avatar = await loadImage(avatarPath);
   ctx.beginPath();
   ctx.arc(110, 120, 50, 0, Math.PI * 2, true);
   ctx.closePath();
@@ -88,6 +105,15 @@ function LineBreak(
   }
 
   ctx.fillText(line, x, y);
+}
+
+function GetRandomUserAvatar() {
+  const dir = "src/assets/avatars";
+
+  const files = require("fs").readdirSync(dir);
+  const chosenFile = files[Math.floor(Math.random() * files.length)];
+
+  return dir + "/" + chosenFile;
 }
 
 export default GenerateDiscordMessage;

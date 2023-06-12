@@ -66,7 +66,8 @@ export class WhosThatMesageListener extends Button {
         name: guild!.name,
         iconURL: guild!.iconURL()!,
       })
-      .setImage(`attachment://${attachment.name}`);
+      .setImage(`attachment://${attachment.name}`)
+      .setTimestamp();
     if (content.length > 150) embed.setDescription(content);
 
     let userToPick = guildData.pickableUsers.filter(

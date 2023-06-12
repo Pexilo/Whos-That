@@ -15,6 +15,7 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.1.4",
     "mongoose": "^7.2.2",
+    "node-vibrant": "^3.2.1-alpha.1",
     "sheweny": "^4.2.1"
   },
   "devDependencies": {

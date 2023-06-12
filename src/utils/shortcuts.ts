@@ -60,7 +60,7 @@ export async function CreateGuild(guild: Guild) {
     .save()
     .then(() =>
       console.log(
-        `➕ Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
+        `âž• Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
       )
     );
 }
@@ -73,7 +73,7 @@ export async function CreateUser(userId: string, guild: Guild) {
 export async function DeleteGuild(guild: Guild) {
   await GuildData.deleteOne({ id: guild.id }).then(() =>
     console.log(
-      `➖ Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
+      `âž– Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
     )
   );
 }
@@ -91,10 +91,6 @@ export async function FetchGuild(guild: Guild) {
 export async function FetchUser(userId: string, guild: Guild) {
   const data = await UserData.findOne({ id: userId });
   if (!data) await CreateUser(userId, guild);
-  if (!data.guilds.includes(guild.id)) {
-    data.guilds.push(guild.id);
-    data.save();
-  }
   return data;
 }
 
