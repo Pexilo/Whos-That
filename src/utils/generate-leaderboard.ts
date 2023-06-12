@@ -7,20 +7,31 @@ async function GetLeaderboard(
   interaction: ButtonInteraction | CommandInteraction,
   messageId?: string
 ) {
-  const users = usersData
+  const sortedUsers = usersData
     .filter((user: { points: number }) => user.points > 0)
-    .sort((a: { points: number }, b: { points: number }) => b.points - a.points)
-    .map((user: IUser, index: number) => {
-      return {
-        index: index + 1,
-        user: interaction.guild!.members.cache.get(user.id),
-        points: user.points,
-        whosThatResponded: user.whosThatResponded.filter(
-          (whosThatResponded: { id: string }) =>
-            whosThatResponded.id === messageId
-        ),
-      };
-    });
+    .sort(
+      (a: { points: number }, b: { points: number }) => b.points - a.points
+    );
+
+  const users = sortedUsers.reduce((acc: any[], user: IUser, index: number) => {
+    const previousUser = sortedUsers[index - 1];
+    const currentUser = user;
+
+    const userObject = {
+      index:
+        previousUser && previousUser.points === currentUser.points
+          ? acc[index - 1].index
+          : index + 1,
+      user: interaction.guild!.members.cache.get(user.id),
+      points: user.points,
+      whosThatResponded: user.whosThatResponded.filter(
+        (whosThatResponded: { id: string }) =>
+          whosThatResponded.id === messageId
+      ),
+    };
+
+    return [...acc, userObject];
+  }, []);
 
   const user = users.find(
     (user: { index: number; user: GuildMember | undefined; points: any }) =>
@@ -77,9 +88,9 @@ async function GetLeaderboard(
             },
             i: number
           ) =>
-            `${i < 3 ? rankEmoji[i] : user.index + "."} **${
-              user.user?.user
-            }** — \`${user.points}\` points ${
+            `${
+              user.index < 4 ? rankEmoji[user.index - 1] : user.index + "."
+            } **${user.user?.user}** — \`${user.points}\` points ${
               user.whosThatResponded.length > 0
                 ? user.whosThatResponded[0].correct
                   ? "✅"
@@ -89,6 +100,7 @@ async function GetLeaderboard(
         )
         .join("\n")
     )
+
     .setFooter({
       text: `You are ${userRankText} with ${userPointsText}.`,
       iconURL: interaction.user.displayAvatarURL(),
