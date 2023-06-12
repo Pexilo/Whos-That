@@ -62,13 +62,13 @@ export default async function SelectUsers(
   //Buttons Row
   const buttonRow = new ActionRowBuilder<ButtonBuilder>();
   const previousButton = new ButtonBuilder()
-    .setCustomId("previous")
-    .setLabel("Previous")
+    .setCustomId("previous-users")
+    .setEmoji("◀️")
     .setStyle(ButtonStyle.Secondary)
     .setDisabled(true);
   const nextButton = new ButtonBuilder()
-    .setCustomId("next")
-    .setLabel("Next")
+    .setCustomId("next-users")
+    .setEmoji("▶️")
     .setStyle(ButtonStyle.Secondary);
   buttonRow.addComponents(previousButton, nextButton);
 
@@ -86,10 +86,10 @@ export default async function SelectUsers(
   //Manage events
   collector.on("collect", async (button) => {
     switch (button.customId) {
-      case "previous":
+      case "previous-users":
         currentPageIndex--;
         break;
-      case "next":
+      case "next-users":
         currentPageIndex++;
         break;
     }

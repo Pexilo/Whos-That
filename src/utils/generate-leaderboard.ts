@@ -1,11 +1,21 @@
 import IUser from "@models/IUser";
-import { ButtonInteraction, CommandInteraction, GuildMember } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  CommandInteraction,
+  ComponentType,
+  GuildMember,
+} from "discord.js";
 import { Embed } from "./shortcuts";
+import { constrainedMemory } from "process";
 
 async function GetLeaderboard(
   usersData: IUser[],
   interaction: ButtonInteraction | CommandInteraction,
-  messageId?: string
+  messageId?: string,
+  page?: number
 ) {
   const sortedUsers = usersData
     .filter((user: { points: number }) => user.points > 0)
@@ -40,7 +50,7 @@ async function GetLeaderboard(
 
   if (!user)
     return interaction.editReply({
-      content: "An error occured. Could not fetch user.",
+      content: "An error occurred. Could not fetch user.",
     });
 
   const userIndex = users.indexOf(user);
@@ -70,6 +80,11 @@ async function GetLeaderboard(
 
   const userPointsText = `${userPoints} ${userPointsSuffix}`;
 
+  // Split users into multiple pages with a page size of 10
+  const pageSize = 10;
+  const totalPages = Math.ceil(users.length / pageSize);
+  const currentPage = page ? page : Math.floor(userIndex / pageSize) + 1;
+
   const embed = Embed()
     .setAuthor({
       name: `Leaderboard for ${interaction.guild!.name}`,
@@ -77,7 +92,7 @@ async function GetLeaderboard(
     })
     .setDescription(
       users
-        .slice(0, 10)
+        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
         .map(
           (
             user: {
@@ -100,13 +115,59 @@ async function GetLeaderboard(
         )
         .join("\n")
     )
-
     .setFooter({
-      text: `You are ${userRankText} with ${userPointsText}.`,
+      text: `Page ${currentPage}/${totalPages} | You are ${userRankText} with ${userPointsText}.`,
       iconURL: interaction.user.displayAvatarURL(),
     });
 
-  return interaction.editReply({ embeds: [embed] });
+  // Create pagination buttons
+  const previousButton = new ButtonBuilder()
+    .setCustomId("previous-leaderboard")
+    .setEmoji("◀️")
+    .setStyle(ButtonStyle.Secondary)
+    .setDisabled(currentPage === 1);
+
+  const nextButton = new ButtonBuilder()
+    .setCustomId("next-leaderboard")
+    .setEmoji("▶️")
+    .setStyle(ButtonStyle.Secondary)
+    .setDisabled(currentPage === totalPages);
+
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    previousButton,
+    nextButton
+  );
+
+  // Send the embed with buttons
+  const reply = await interaction.editReply({
+    embeds: [embed],
+    components: [buttonRow],
+  });
+
+  // Create a collector to listen for button interactions
+  const collector = reply.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 60000,
+  });
+
+  // Handle button interactions
+  collector.on("collect", async (i: ButtonInteraction) => {
+    if (i.customId === "previous-leaderboard") {
+      // Go to the previous page
+      await i.deferUpdate();
+      collector.stop();
+      if (currentPage > 1) {
+        GetLeaderboard(usersData, interaction, messageId, currentPage - 1);
+      }
+    } else if (i.customId === "next-leaderboard") {
+      // Go to the next page
+      await i.deferUpdate();
+      collector.stop();
+      if (currentPage < totalPages) {
+        GetLeaderboard(usersData, interaction, messageId, currentPage + 1);
+      }
+    }
+  });
 }
 
 export { GetLeaderboard };

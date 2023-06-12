@@ -42,7 +42,7 @@ export class WhosThatSelect extends SelectMenu {
     );
     if (messageAlreadyResponded && messageAlreadyResponded.id === messageId)
       return selectMenu.editReply({
-        content: `⛔ Vous avez déjà répondu aujourd'hui !\nLa réponse était <@${authorId}> ! ${message.url}\n\n> Points: \`${userData.points}\` points`,
+        content: `⛔ Vous avez déjà répondu !\nLa réponse était <@${authorId}> ! ${message.url}\n\n> Points: \`${userData.points}\` points`,
       });
 
     const whosthatRes = [
