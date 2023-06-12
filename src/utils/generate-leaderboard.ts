@@ -156,14 +156,18 @@ async function GetLeaderboard(
   collector.on("collect", async (i: ButtonInteraction) => {
     if (i.customId === "previous-leaderboard") {
       // Go to the previous page
-      await i.deferUpdate();
+      try {
+        await i.deferUpdate();
+      } catch (error) {}
       collector.stop();
       if (currentPage > 1) {
         GetLeaderboard(usersData, interaction, messageId, currentPage - 1);
       }
     } else if (i.customId === "next-leaderboard") {
       // Go to the next page
-      await i.deferUpdate();
+      try {
+        await i.deferUpdate();
+      } catch (error) {}
       collector.stop();
       if (currentPage < totalPages) {
         GetLeaderboard(usersData, interaction, messageId, currentPage + 1);
