@@ -9,7 +9,14 @@ import {
   GuildMember,
 } from "discord.js";
 import { Embed } from "./shortcuts";
-import { constrainedMemory } from "process";
+
+type LeaderboardUser = {
+  index: number;
+  position: number;
+  user: GuildMember | undefined;
+  points: number;
+  whosThatResponded: { id: string; correct: boolean }[];
+};
 
 async function GetLeaderboard(
   usersData: IUser[],
@@ -25,13 +32,15 @@ async function GetLeaderboard(
 
   const users = sortedUsers.reduce((acc: any[], user: IUser, index: number) => {
     const previousUser = sortedUsers[index - 1];
+    const previousPosition = acc[index - 1] ? acc[index - 1].position : -1;
     const currentUser = user;
 
     const userObject = {
-      index:
+      index: index,
+      position:
         previousUser && previousUser.points === currentUser.points
-          ? acc[index - 1].index
-          : index + 1,
+          ? previousPosition
+          : previousPosition + 1,
       user: interaction.guild!.members.cache.get(user.id),
       points: user.points,
       whosThatResponded: user.whosThatResponded.filter(
@@ -44,8 +53,7 @@ async function GetLeaderboard(
   }, []);
 
   const user = users.find(
-    (user: { index: number; user: GuildMember | undefined; points: any }) =>
-      user.user?.id === interaction.user.id
+    (user: LeaderboardUser) => user.user?.id === interaction.user.id
   );
 
   if (!user)
@@ -94,17 +102,11 @@ async function GetLeaderboard(
       users
         .slice((currentPage - 1) * pageSize, currentPage * pageSize)
         .map(
-          (
-            user: {
-              index: number;
-              user: GuildMember | undefined;
-              points: number;
-              whosThatResponded: { id: string; correct: boolean }[];
-            },
-            i: number
-          ) =>
+          (user: LeaderboardUser) =>
             `${
-              user.index < 4 ? rankEmoji[user.index - 1] : user.index + "."
+              user.position + 1 < 4
+                ? rankEmoji[user.position]
+                : `${user.position + 1}.`
             } **${user.user?.user}** — \`${user.points}\` points ${
               user.whosThatResponded.length > 0
                 ? user.whosThatResponded[0].correct
