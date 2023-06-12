@@ -1,7 +1,7 @@
 import { GlobalFonts } from "@napi-rs/canvas";
 import { AttachmentBuilder, Message } from "discord.js";
 import { join } from "path";
-import { Truncate } from "./shortcuts";
+import { FormatToDcDate, Truncate } from "./shortcuts";
 import Vibrant = require("node-vibrant");
 
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
@@ -49,12 +49,10 @@ async function GenerateDiscordMessage(message: Message) {
 
   //Date
   const msgDate = new Date(message.createdTimestamp);
-  const dateDDMMYYYY = `${msgDate.getDate()}/${
-    msgDate.getMonth() + 1
-  }/${msgDate.getFullYear()} ${msgDate.getHours()}:${msgDate.getMinutes()}`;
+  const dateDDMMYYYY = FormatToDcDate(msgDate);
   ctx.font = "20px 'GGSans', 'NotoEmoji'";
   ctx.fillStyle = "#b9bbbe";
-  ctx.fillText(dateDDMMYYYY, 350, 105);
+  ctx.fillText(dateDDMMYYYY, 345, 105);
 
   //User avatar
   const avatar = await loadImage(avatarPath);
