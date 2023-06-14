@@ -24,6 +24,7 @@
       "@images/*": ["src/images/*"],
       "@models/*": ["src/models/*"],
       "@assets/*": ["src/assets/*"],
+      "@lang/*": ["src/lang/*"],
       "@rootDir": ["./"]
     }
   },

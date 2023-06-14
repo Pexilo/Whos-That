@@ -1,3 +1,4 @@
+import IGuild from "@models/IGuild";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -9,7 +10,6 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { FetchGuild } from "./shortcuts";
-import IGuild from "@models/IGuild";
 
 export default async function SelectUsers(
   members: GuildMember[],

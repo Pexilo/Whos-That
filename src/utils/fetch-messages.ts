@@ -1,5 +1,5 @@
-import { TextChannel, Guild, CommandInteraction } from "discord.js";
 import { UpdateGuild } from "@utils/shortcuts";
+import { CommandInteraction, Guild, TextChannel } from "discord.js";
 
 export async function fetchChannelCheckpoints(
   source: TextChannel,

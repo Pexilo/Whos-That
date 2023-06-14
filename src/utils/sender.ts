@@ -1,3 +1,4 @@
+import IGuild from "@models/IGuild";
 import { Embed } from "@utils/shortcuts";
 import {
   ButtonBuilder,
@@ -7,8 +8,7 @@ import {
   TextChannel,
 } from "discord.js";
 import { ShewenyClient } from "sheweny";
-import IGuild from "@models/IGuild";
-const { GuildData } = require("./db/index");
+const { GuildData } = require("../db/index");
 
 const NumberToEmoji = [
   "1️⃣",

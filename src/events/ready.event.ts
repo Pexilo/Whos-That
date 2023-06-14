@@ -1,5 +1,5 @@
-import { Event } from "sheweny";
 import type { ShewenyClient } from "sheweny";
+import { Event } from "sheweny";
 
 export class ReadyEvent extends Event {
   constructor(client: ShewenyClient) {

@@ -1,0 +1,30 @@
+{
+  "commands": {
+    "language": {
+      "response": "✅ The language of the bot is now set to `English` 🇬🇧."
+    },
+    "setup": {
+      "processed": "`✅ Approximately \\`${approxMsgs}\\` messages were processed.`",
+      "done": "`🤖 **WhosThat** is now setup to send messages in <#${whosThatChannel.id}>.\n\n> <#${pickerChannel.id}> will let you pick between 10 messages everyday.\n> Make sure to select the best message to send!`"
+    },
+    "ping": {
+      "title": "Pong!",
+      "fields": [
+        {
+          "name": "Bot Latency"
+        },
+        {
+          "name": "Discord API"
+        }
+      ]
+    },
+    "whosthat": {
+      "response": "`💬 Message sent ${message}`"
+    }
+  },
+  "utils": {
+    "sender": {
+      "error": "`❌ An error occured while sending the message. Check that the bot is setup correctly.\n\n> Don't forget to setup </users:${config.default.SLASH_COMMANDS_IDS.users}>`"
+    }
+  }
+}

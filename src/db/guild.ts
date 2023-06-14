@@ -13,6 +13,10 @@ const guildSchema = new mongoose.Schema({
   sourceChannel: String,
   pickerChannel: String,
   whosThatChannel: String,
+  language: {
+    type: String,
+    default: "en",
+  },
 });
 
 export default mongoose.model("Guild", guildSchema);

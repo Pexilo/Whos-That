@@ -4,4 +4,7 @@ dotenv.config();
 export default {
   DISCORD_TOKEN: process.env.DISCORD_TOKEN,
   MONGO_URI: process.env.MONGO_URI,
+  SLASH_COMMANDS_IDS: {
+    users: "1118657612783812622",
+  },
 };

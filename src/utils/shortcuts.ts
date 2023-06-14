@@ -1,14 +1,14 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
   CommandInteraction,
   EmbedBuilder,
   Guild,
-  ButtonBuilder,
-  ActionRowBuilder,
-  ButtonInteraction,
   StringSelectMenuInteraction,
 } from "discord.js";
 import { ShewenyClient } from "sheweny";
-import { SendMessageToPickerChannel } from "../sender";
+import { SendMessageToPickerChannel } from "./sender";
 const { UserData } = require("../db/index");
 const { GuildData } = require("../db/index");
 
@@ -137,4 +137,10 @@ export function FormatToDcDate(date: Date) {
   const minutes = ("0" + date.getMinutes()).slice(-2);
   const dateDDMMYYYYHHM = `${day}/${month}/${year} ${hours}:${minutes}`;
   return dateDDMMYYYYHHM;
+}
+
+export async function FetchAndGetLang(guild: Guild) {
+  const guildData = await FetchGuild(guild);
+  if (guildData) return { guildData, lang: guildData.language };
+  else return { guildData: null, lang: "en" };
 }

@@ -1,15 +1,15 @@
-import { Button } from "sheweny";
-import type { ShewenyClient } from "sheweny";
-import { type ButtonInteraction } from "discord.js";
+import { GetLeaderboard } from "@utils/generate-leaderboard";
 import {
   Defer,
   FetchGuild,
   FetchUser,
   FetchUsersFromGuild,
 } from "@utils/shortcuts";
-import { GetLeaderboard } from "@utils/generate-leaderboard";
+import { type ButtonInteraction } from "discord.js";
+import type { ShewenyClient } from "sheweny";
+import { Button } from "sheweny";
 
-export class Leaderboard extends Button {
+export class LeaderboardButtons extends Button {
   constructor(client: ShewenyClient) {
     super(client, [/whosthat-leaderboard_.*/]);
   }

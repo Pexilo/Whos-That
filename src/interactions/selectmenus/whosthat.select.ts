@@ -1,9 +1,9 @@
-import { Defer, FetchGuild, FetchUser, UpdateUser } from "@utils/shortcuts";
-import { StringSelectMenuInteraction, TextChannel } from "discord.js";
-import { SelectMenu } from "sheweny";
-import type { ShewenyClient } from "sheweny";
 import IGuild from "@models/IGuild";
 import IWTRes from "@models/IWTRes";
+import { Defer, FetchGuild, FetchUser, UpdateUser } from "@utils/shortcuts";
+import { StringSelectMenuInteraction, TextChannel } from "discord.js";
+import type { ShewenyClient } from "sheweny";
+import { SelectMenu } from "sheweny";
 
 export class WhosThatSelect extends SelectMenu {
   constructor(client: ShewenyClient) {

@@ -1,8 +1,8 @@
+import IGuild from "@models/IGuild";
 import { FetchGuild, FetchUser, UpdateGuild } from "@utils/shortcuts";
 import { StringSelectMenuInteraction } from "discord.js";
-import { SelectMenu } from "sheweny";
 import type { ShewenyClient } from "sheweny";
-import IGuild from "@models/IGuild";
+import { SelectMenu } from "sheweny";
 
 export class UserSelect extends SelectMenu {
   constructor(client: ShewenyClient) {

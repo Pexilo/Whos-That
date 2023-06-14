@@ -1,5 +1,6 @@
-import { Button } from "sheweny";
-import type { ShewenyClient } from "sheweny";
+import IGuild from "@models/IGuild";
+import GenerateDiscordMessage from "@utils/generate-image";
+import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -9,13 +10,12 @@ import {
   StringSelectMenuOptionBuilder,
   TextChannel,
 } from "discord.js";
-import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
-import GenerateDiscordMessage from "@utils/generate-image";
-import { SendMessageToPickerChannel } from "src/sender";
-import IGuild from "@models/IGuild";
+import type { ShewenyClient } from "sheweny";
+import { Button } from "sheweny";
+import { SendMessageToPickerChannel } from "@utils/sender";
 const { randoSequence } = require("@nastyox/rando.js");
 
-export class WhosThatMesageListener extends Button {
+export class WhosThatMesageButtons extends Button {
   constructor(client: ShewenyClient) {
     super(client, [/picker_.*/]);
   }
