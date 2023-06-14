@@ -1,25 +1,15 @@
-import { ShewenyClient } from "sheweny";
-import { IntentsBitField, PermissionFlagsBits, Partials } from "discord.js";
-const { mongoose } = require("mongoose");
-import config from "./config";
 import { ScheduleFunction } from "@utils/shortcuts";
+import { IntentsBitField, Partials, PermissionFlagsBits } from "discord.js";
+import { ShewenyClient } from "sheweny";
+import config from "./config";
+const { mongoose } = require("mongoose");
 
 interface Error {
   reason?: string;
 }
 const client = new ShewenyClient({
-  intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.GuildVoiceStates,
-    IntentsBitField.Flags.GuildPresences,
-  ],
-  partials: [
-    Partials.GuildMember,
-    Partials.Message,
-    Partials.Reaction,
-    Partials.User,
-  ],
+  intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages],
+  partials: [Partials.GuildMember, Partials.Message, Partials.User],
   managers: {
     commands: {
       directory: "./commands",
