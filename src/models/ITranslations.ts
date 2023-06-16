@@ -53,6 +53,7 @@ export default interface ITranslations {
     };
     generateImage: {
       user: string;
+      dateSpace: number;
     };
     generateLeaderboard: {
       fetchUserErr: string;

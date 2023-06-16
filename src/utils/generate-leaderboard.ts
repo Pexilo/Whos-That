@@ -16,7 +16,12 @@ type LeaderboardUser = {
   position: number;
   user: GuildMember | undefined;
   points: number;
-  whosThatResponded: { id: string; correct: boolean }[];
+  whosThatResponded: { guildId: string, messageId: string; correct: boolean }[];
+};
+
+type pointsArray = {
+  guildId: string;
+  score: number;
 };
 
 async function GetLeaderboard(
@@ -33,9 +38,10 @@ async function GetLeaderboard(
   const { guild } = interaction;
 
   const sortedUsers = usersData
-    .filter((user: { points: number }) => user.points > 0)
+    .filter((user: { points: pointsArray }) => user.points.guildId === guild!.id && user.points.score > 0)
     .sort(
-      (a: { points: number }, b: { points: number }) => b.points - a.points
+      (a: { points: pointsArray }, b: { points: pointsArray }) =>
+        b.points.score - a.points.score
     );
 
   const users = sortedUsers.reduce((acc: any[], user: IUser, index: number) => {
@@ -52,8 +58,8 @@ async function GetLeaderboard(
       user: guild!.members.cache.get(user.id),
       points: user.points,
       whosThatResponded: user.whosThatResponded.filter(
-        (whosThatResponded: { id: string }) =>
-          whosThatResponded.id === messageId
+        (whosThatResponded: { messageId: string }) =>
+          whosThatResponded.messageId === messageId
       ),
     };
 
@@ -78,16 +84,15 @@ async function GetLeaderboard(
     userRankLastDigit === "1"
       ? generateLeaderboard.st
       : userRankLastDigit === "2"
-      ? generateLeaderboard.nd
-      : userRankLastDigit === "3"
-      ? generateLeaderboard.rd
-      : generateLeaderboard.th;
+        ? generateLeaderboard.nd
+        : userRankLastDigit === "3"
+          ? generateLeaderboard.rd
+          : generateLeaderboard.th;
 
   const rankEmoji = ["🥇", "🥈", "🥉"];
 
-  const userRankText = `${
-    userRank < 4 ? rankEmoji[userRank - 1] : "🏅"
-  } ${userRank}${userRankSuffix}`;
+  const userRankText = `${userRank < 4 ? rankEmoji[userRank - 1] : "🏅"
+    } ${userRank}${userRankSuffix}`;
 
   const userPoints = user.points;
   const userPointsString = userPoints.toString();
@@ -113,18 +118,15 @@ async function GetLeaderboard(
         .slice((currentPage - 1) * pageSize, currentPage * pageSize)
         .map(
           (user: LeaderboardUser) =>
-            `${
-              user.position + 1 < 4
-                ? rankEmoji[user.position]
-                : `${user.position + 1}.`
-            } **${user.user?.user}** — \`${user.points}\` ${
-              generateLeaderboard.points
-            } ${
-              user.whosThatResponded.length > 0
-                ? user.whosThatResponded[0].correct
-                  ? "✅"
-                  : "❌"
-                : ""
+            `${user.position + 1 < 4
+              ? rankEmoji[user.position]
+              : `${user.position + 1}.`
+            } **${user.user?.user}** — \`${user.points}\` ${generateLeaderboard.points
+            } ${user.whosThatResponded.length > 0
+              ? user.whosThatResponded[0].correct
+                ? "✅"
+                : "❌"
+              : ""
             }`
         )
         .join("\n")
@@ -170,7 +172,7 @@ async function GetLeaderboard(
       // Go to the previous page
       try {
         await i.deferUpdate();
-      } catch (error) {}
+      } catch (error) { }
       collector.stop();
       if (currentPage > 1) {
         GetLeaderboard(
@@ -185,7 +187,7 @@ async function GetLeaderboard(
       // Go to the next page
       try {
         await i.deferUpdate();
-      } catch (error) {}
+      } catch (error) { }
       collector.stop();
       if (currentPage < totalPages) {
         GetLeaderboard(

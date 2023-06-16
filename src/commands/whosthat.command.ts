@@ -9,9 +9,9 @@ export class WhosThatCommand extends Command {
   constructor(client: ShewenyClient) {
     super(client, {
       name: "whosthat",
-      description: "❔ Send a whosthat message to the picker channel",
+      description: "❔ Send a whosthat message",
       descriptionLocalizations: {
-        fr: "❔ Envoie un message whosthat au channel de choix",
+        fr: "❔ Envoie un message whosthat",
       },
       category: "Misc",
       clientPermissions: ["EmbedLinks"],

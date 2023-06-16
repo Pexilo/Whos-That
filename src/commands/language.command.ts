@@ -56,7 +56,7 @@ export class LanguageCommand extends Command {
     const language = languageManager.getCommandTranslation(lang).language;
 
     await UpdateGuild(guild!, {
-      lang: lang,
+      language: lang,
     });
 
     return interaction.followUp({

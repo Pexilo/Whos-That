@@ -7,14 +7,20 @@ const userSchema = new mongoose.Schema({
     default: ["" /* Guild ID */],
   },
   points: {
-    type: Number,
-    default: 0,
+    type: Array,
+    default: [
+      {
+        guildId: "",
+        score: 0,
+      },
+    ],
   },
   whosThatResponded: {
     type: Array,
     default: [
       {
-        id: "",
+        messageId: "",
+        guildId: "",
         correct: false,
       },
     ],

@@ -7,6 +7,6 @@ export default {
   SLASH_COMMANDS_IDS: {
     users: "1118657612783812622",
     setup: "1118657612783812621",
-    whosthat: "1118657612783812623",
+    whosthat: "1119193500429336669",
   },
 };
