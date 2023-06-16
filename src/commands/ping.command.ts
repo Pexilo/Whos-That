@@ -28,7 +28,7 @@ export class PingCommand extends Command {
     const languageManager = new LanguageManager();
     const ping = languageManager.getCommandTranslation(lang).ping;
 
-    return await interaction.followUp({
+    return await interaction.editReply({
       embeds: [
         Embed()
           .setTitle(`🏓 ${ping.title}`)

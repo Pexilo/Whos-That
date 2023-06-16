@@ -21,7 +21,7 @@ export class ClientMissingPermissionsListener extends Event {
     const clientMissingPermissions =
       languageManager.getEventTranslation(lang).clientMissingPermissions;
 
-    return await interaction.followUp({
+    return await interaction.editReply({
       content: eval(clientMissingPermissions.response),
     });
   }

@@ -25,8 +25,7 @@ export class LeaderboardCommand extends Command {
     await Defer(interaction);
 
     const usersData: IUser[] = await FetchUsersFromGuild(guild!);
-    const { lang } = await FetchAndGetLang(guild!);
 
-    GetLeaderboard(usersData, interaction, lang);
+    GetLeaderboard(usersData, interaction);
   }
 }

@@ -10,6 +10,6 @@ type pointsArray = {
 export default interface IUser {
   id: string;
   guilds: string[];
-  points: pointsArray;
+  points: pointsArray[];
   whosThatResponded: WhosThatResponded[];
 }

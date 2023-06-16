@@ -25,7 +25,7 @@ export class PickUsersCommand extends Command {
     const { guild } = interaction;
     await Defer(interaction);
 
-    const GuildMembers = guild!.members.cache
+    const GuildMembers = (await guild!.members.fetch())
       .filter((member) => !member.user.bot)
       .map((member) => member);
 

@@ -1,3 +1,4 @@
+type DateFormat = "DD/MM/YYYY" | "MM/DD/YYYY";
 export default interface ITranslations {
   commands: {
     language: {
@@ -54,8 +55,10 @@ export default interface ITranslations {
     generateImage: {
       user: string;
       dateSpace: number;
+      dateFormat: DateFormat;
     };
     generateLeaderboard: {
+      noUsersErr: string;
       fetchUserErr: string;
       st: string;
       nd: string;

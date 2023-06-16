@@ -44,7 +44,7 @@
     "whosThatSelect": {
       "fetchSourceErr": "❌ An error occured. Could not fetch sourceChannel. Please try again later.",
       "fetchMsgErr": "❌ An error occured. Could not fetch the message. Please try again later.",
-      "alreadyResponded": "`❌ You already responded to this message.\nThe response was <@${authorId}>!\n\n> Original message: ${message.url}`",
+      "alreadyResponded": "`🚫 You already responded to this message.\nThe response was <@${authorId}>!\n\n> Original message: ${message.url}`",
       "rightAnswerRes": "`✅ You got it right! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+1\\` participation point\n> \\`+1\\` right answer point\n> Total: \\`${totalPoints}\\` points`",
       "wrongAnswerRes": "`❌ You got it wrong! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+1\\` participation point\n> Total: \\`${totalPoints}\\` points`"
     }
@@ -55,17 +55,19 @@
     },
     "generateImage": {
       "user": "User",
-      "dateSpace": 275
+      "dateSpace": 275,
+      "dateFormat": "MM/DD/YYYY"
     },
     "generateLeaderboard": {
-      "fetchUserErr": "❌ An error occured while fetching the user. Please try again later.",
+      "noUsersErr": "❌ The users didn't played **Who's That** yet.",
+      "fetchUserErr": "`❌ An error occured while fetching the user. Please check your configuration with </setup:${config.default.SLASH_COMMANDS_IDS.setup}> and try again later.`",
       "st": "st",
       "nd": "nd",
       "rd": "rd",
       "th": "th",
       "point": "point",
+      "author": "`Leaderboard for ${guildName}`",
       "points": "points",
-      "author": "`Leaderboard for ${interaction.guild!.name}`",
       "footer": "`Page ${currentPage}/${totalPages} | You are ${userRankText} with ${userPointsText}.`"
     },
     "generateSelectUsers": {
@@ -73,7 +75,7 @@
       "response": "`✅ **WhosThat** is now setup to send messages in <#${guildData.whosThatChannel}>.\nYou can now choose wich users to pick from with the select menu below.`"
     },
     "sender": {
-      "noDataErr": " `❌ An error occured while fetching the data. Please check your configuration with \\`</setup:${config.default.SLASH_COMMANDS_IDS.setup}>\\` and try again later.`",
+      "noDataErr": " `❌ An error occured while fetching the data. Please check your configuration with </setup:${config.default.SLASH_COMMANDS_IDS.setup}> and try again later.`",
       "fetchChannelErr": "❌ An error occured while fetching the channels. Please try again later.",
       "title": "Whos that?",
       "description": "`Pick the message to send to <#${guildData.whosThatChannel}>`",

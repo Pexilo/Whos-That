@@ -8,22 +8,9 @@ const userSchema = new mongoose.Schema({
   },
   points: {
     type: Array,
-    default: [
-      {
-        guildId: "",
-        score: 0,
-      },
-    ],
   },
   whosThatResponded: {
     type: Array,
-    default: [
-      {
-        messageId: "",
-        guildId: "",
-        correct: false,
-      },
-    ],
   },
 });
 

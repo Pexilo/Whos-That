@@ -12,8 +12,9 @@ async function GenerateDiscordMessage(message: Message, lang: string) {
   const generateImage = languageManager.getUtilsTranslation(lang).generateImage;
 
   const date = new Date();
-  const dateStr = `${date.getFullYear()}-${date.getMonth() + 1
-    }-${date.getDate()}`;
+  const dateStr = `${date.getFullYear()}-${
+    date.getMonth() + 1
+  }-${date.getDate()}`;
   const fileName = `${dateStr}_${message.id}.png`;
 
   GlobalFonts.registerFromPath("src/assets/ggsans-Normal.ttf", "GGSans");
@@ -52,10 +53,10 @@ async function GenerateDiscordMessage(message: Message, lang: string) {
 
   //Date
   const msgDate = new Date(message.createdTimestamp);
-  const dateDDMMYYYY = FormatToDcDate(msgDate);
+  const dateDDMMYYYY = FormatToDcDate(msgDate, generateImage.dateFormat);
   ctx.font = "20px 'GGSans', 'sans-serif', 'NotoEmoji'";
   ctx.fillStyle = "#b9bbbe";
-  ctx.fillText(dateDDMMYYYY, generateImage.dateSpace, 105);
+  ctx.fillText(dateDDMMYYYY, generateImage.dateSpace, 104);
 
   //User avatar
   const avatar = await loadImage(avatarPath);

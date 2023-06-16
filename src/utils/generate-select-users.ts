@@ -56,7 +56,7 @@ export default async function SelectUsers(
         return new StringSelectMenuOptionBuilder()
           .setLabel(member.displayName)
           .setValue(member.id)
-          .setDescription(member.user.tag)
+          .setDescription(member.user.username)
           .setDefault(guildData.pickableUsers.includes(member.id));
       })
     );
@@ -73,6 +73,7 @@ export default async function SelectUsers(
     .setCustomId("next-users")
     .setEmoji("▶️")
     .setStyle(ButtonStyle.Secondary);
+  if (totalPages === 1) nextButton.setDisabled(true);
   buttonRow.addComponents(previousButton, nextButton);
 
   await interaction.editReply({
@@ -123,7 +124,7 @@ export default async function SelectUsers(
         return new StringSelectMenuOptionBuilder()
           .setLabel(member.displayName)
           .setValue(member.id)
-          .setDescription(member.user.tag)
+          .setDescription(member.user.username)
           .setDefault(guildData.pickableUsers.includes(member.id));
       })
     );

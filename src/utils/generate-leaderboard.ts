@@ -9,70 +9,91 @@ import {
   ComponentType,
   GuildMember,
 } from "discord.js";
-import { Embed } from "./shortcuts";
+import { Embed, FetchAndGetLang } from "./shortcuts";
 
 type LeaderboardUser = {
   index: number;
   position: number;
   user: GuildMember | undefined;
   points: number;
-  whosThatResponded: { guildId: string, messageId: string; correct: boolean }[];
+  whosThatResponded: { guildId: string; messageId: string; correct: boolean }[];
 };
-
 type pointsArray = {
   guildId: string;
   score: number;
 };
-
 async function GetLeaderboard(
   usersData: IUser[],
   interaction: ButtonInteraction | CommandInteraction,
-  lang: string,
   messageId?: string,
   page?: number
 ) {
+  const { guild } = interaction;
+  const guildName = guild!.name;
+  const config = require("src/config.ts");
+
+  const { lang } = await FetchAndGetLang(guild!);
   const languageManager = new LanguageManager();
   const generateLeaderboard =
     languageManager.getUtilsTranslation(lang).generateLeaderboard;
 
-  const { guild } = interaction;
-
   const sortedUsers = usersData
-    .filter((user: { points: pointsArray }) => user.points.guildId === guild!.id && user.points.score > 0)
+    .filter(
+      (user: { points: pointsArray[] }) =>
+        user.points.length > 0 &&
+        user.points.find((point: pointsArray) => point.guildId === guild!.id)
+    )
     .sort(
-      (a: { points: pointsArray }, b: { points: pointsArray }) =>
-        b.points.score - a.points.score
+      (a: { points: pointsArray[] }, b: { points: pointsArray[] }) =>
+        b.points.find((point: pointsArray) => point.guildId === guild!.id)!
+          .score -
+        a.points.find((point: pointsArray) => point.guildId === guild!.id)!
+          .score
     );
+  if (sortedUsers.length === 0)
+    return interaction.editReply({ content: generateLeaderboard.noUsersErr });
 
-  const users = sortedUsers.reduce((acc: any[], user: IUser, index: number) => {
-    const previousUser = sortedUsers[index - 1];
-    const previousPosition = acc[index - 1] ? acc[index - 1].position : -1;
-    const currentUser = user;
+  const users = await sortedUsers.reduce(
+    async (acc: Promise<any[]>, user: IUser, index: number) => {
+      const previousUser = sortedUsers[index - 1];
+      const previousPosition = index > 0 ? (await acc)[index - 1].position : -1;
+      const currentUser = user;
 
-    const userObject = {
-      index: index,
-      position:
-        previousUser && previousUser.points === currentUser.points
-          ? previousPosition
-          : previousPosition + 1,
-      user: guild!.members.cache.get(user.id),
-      points: user.points,
-      whosThatResponded: user.whosThatResponded.filter(
-        (whosThatResponded: { messageId: string }) =>
-          whosThatResponded.messageId === messageId
-      ),
-    };
+      const userObject = {
+        index: index,
+        position:
+          previousUser &&
+          previousUser.points.find(
+            (point: pointsArray) => point.guildId === guild!.id
+          )!.score ===
+            currentUser.points.find(
+              (point: pointsArray) => point.guildId === guild!.id
+            )!.score
+            ? previousPosition
+            : previousPosition + 1,
 
-    return [...acc, userObject];
-  }, []);
+        user: await guild!.members.fetch(user.id),
+        points: user.points.find(
+          (point: pointsArray) => point.guildId === guild!.id
+        )!.score,
+        whosThatResponded: user.whosThatResponded.filter(
+          (whosThatResponded: { messageId: string }) =>
+            whosThatResponded.messageId === messageId
+        ),
+      };
 
-  const user = users.find(
+      return [...(await acc), userObject];
+    },
+    Promise.resolve([])
+  );
+
+  const user: IUser = users.find(
     (user: LeaderboardUser) => user.user?.id === interaction.user.id
   );
 
   if (!user)
     return interaction.editReply({
-      content: generateLeaderboard.fetchUserErr,
+      content: eval(generateLeaderboard.fetchUserErr),
     });
 
   const userIndex = users.indexOf(user);
@@ -84,17 +105,18 @@ async function GetLeaderboard(
     userRankLastDigit === "1"
       ? generateLeaderboard.st
       : userRankLastDigit === "2"
-        ? generateLeaderboard.nd
-        : userRankLastDigit === "3"
-          ? generateLeaderboard.rd
-          : generateLeaderboard.th;
+      ? generateLeaderboard.nd
+      : userRankLastDigit === "3"
+      ? generateLeaderboard.rd
+      : generateLeaderboard.th;
 
   const rankEmoji = ["🥇", "🥈", "🥉"];
 
-  const userRankText = `${userRank < 4 ? rankEmoji[userRank - 1] : "🏅"
-    } ${userRank}${userRankSuffix}`;
+  const userRankText = `${
+    userRank < 4 ? rankEmoji[userRank - 1] : "🏅"
+  } ${userRank}${userRankSuffix}`;
 
-  const userPoints = user.points;
+  const userPoints = users[userIndex].points;
   const userPointsString = userPoints.toString();
   const userPointsLastDigit = userPointsString[userPointsString.length - 1];
   const userPointsSuffix =
@@ -118,21 +140,24 @@ async function GetLeaderboard(
         .slice((currentPage - 1) * pageSize, currentPage * pageSize)
         .map(
           (user: LeaderboardUser) =>
-            `${user.position + 1 < 4
-              ? rankEmoji[user.position]
-              : `${user.position + 1}.`
-            } **${user.user?.user}** — \`${user.points}\` ${generateLeaderboard.points
-            } ${user.whosThatResponded.length > 0
-              ? user.whosThatResponded[0].correct
-                ? "✅"
-                : "❌"
-              : ""
+            `${
+              user.position + 1 < 4
+                ? rankEmoji[user.position]
+                : `${user.position + 1}.`
+            } ${user.user?.user} — \`${user.points}\` ${
+              generateLeaderboard.points
+            } ${
+              user.whosThatResponded.length > 0
+                ? user.whosThatResponded[0].correct
+                  ? "✅"
+                  : "❌"
+                : ""
             }`
         )
         .join("\n")
     )
     .setFooter({
-      text: eval(generateLeaderboard.footer),
+      text: eval(generateLeaderboard.author),
       iconURL: interaction.user.displayAvatarURL(),
     });
 
@@ -172,31 +197,19 @@ async function GetLeaderboard(
       // Go to the previous page
       try {
         await i.deferUpdate();
-      } catch (error) { }
+      } catch (error) {}
       collector.stop();
       if (currentPage > 1) {
-        GetLeaderboard(
-          usersData,
-          interaction,
-          lang,
-          messageId,
-          currentPage - 1
-        );
+        GetLeaderboard(usersData, interaction, messageId, currentPage - 1);
       }
     } else if (i.customId === "next-leaderboard") {
       // Go to the next page
       try {
         await i.deferUpdate();
-      } catch (error) { }
+      } catch (error) {}
       collector.stop();
       if (currentPage < totalPages) {
-        GetLeaderboard(
-          usersData,
-          interaction,
-          lang,
-          messageId,
-          currentPage + 1
-        );
+        GetLeaderboard(usersData, interaction, messageId, currentPage + 1);
       }
     }
   });

@@ -101,7 +101,7 @@ export class WhosThatSetupCommand extends Command {
       whosThatChannel: whosThatChannel.id,
     });
 
-    const GuildMembers = guild!.members.cache
+    const GuildMembers = (await guild!.members.fetch())
       .filter((member) => !member.user.bot)
       .map((member) => member);
 

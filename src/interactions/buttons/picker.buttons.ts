@@ -80,7 +80,7 @@ export class WhosThatMesageButtons extends Button {
       (item: { value: any }) => item.value
     );
 
-    const GuildMembers = guild!.members.cache
+    const GuildMembers = (await guild!.members.fetch())
       .filter((m) => userToPick.includes(m.id))
       .map((m) => m);
     GuildMembers.sort(() => Math.random() - 0.5);

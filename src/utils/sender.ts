@@ -30,7 +30,7 @@ export const SendMessageToPickerChannel = async (
   interaction: CommandInteraction | ButtonInteraction,
   guildData: IGuild,
   lang: string
-) => {
+): Promise<boolean> => {
   const { guild } = interaction;
 
   const languageManager = new LanguageManager();
@@ -43,10 +43,12 @@ export const SendMessageToPickerChannel = async (
     !guildData.whosThatChannel ||
     !guildData.checkpoints ||
     guildData.pickableUsers.length < 1
-  )
-    return interaction.editReply({
+  ) {
+    interaction.editReply({
       content: eval(sender.noDataErr),
     });
+    return true;
+  }
 
   const sourceChannel = (await guild!.channels.fetch(
     guildData.sourceChannel
@@ -54,10 +56,12 @@ export const SendMessageToPickerChannel = async (
   const pickerChannel = (await guild!.channels.fetch(
     guildData.pickerChannel
   )) as TextChannel;
-  if (!sourceChannel || !pickerChannel)
-    return interaction.editReply({
+  if (!sourceChannel || !pickerChannel) {
+    interaction.editReply({
       content: sender.fetchChannelErr,
     });
+    return true;
+  }
 
   const randomCheckpoints = guildData.checkpoints
     .sort(() => Math.random() - 0.5)
@@ -110,12 +114,12 @@ export const SendMessageToPickerChannel = async (
           buttons.length > 1
             ? buttons.slice(0, buttons.length < 5 ? buttons.length : 5)
             : [
-              new ButtonBuilder()
-                .setCustomId("button-disable2")
-                .setEmoji("❌")
-                .setStyle(ButtonStyle.Secondary)
-                .setDisabled(true),
-            ],
+                new ButtonBuilder()
+                  .setCustomId("button-disable2")
+                  .setEmoji("❌")
+                  .setStyle(ButtonStyle.Secondary)
+                  .setDisabled(true),
+              ],
       },
       {
         type: 1,
@@ -123,12 +127,12 @@ export const SendMessageToPickerChannel = async (
           buttons.length > 5
             ? buttons.slice(5, buttons.length)
             : [
-              new ButtonBuilder()
-                .setCustomId("button-disable1")
-                .setEmoji("❌")
-                .setStyle(ButtonStyle.Secondary)
-                .setDisabled(true),
-            ],
+                new ButtonBuilder()
+                  .setCustomId("button-disable1")
+                  .setEmoji("❌")
+                  .setStyle(ButtonStyle.Secondary)
+                  .setDisabled(true),
+              ],
       },
       {
         type: 1,
@@ -141,6 +145,7 @@ export const SendMessageToPickerChannel = async (
       },
     ],
   });
+  return false;
 };
 
 async function SortMessages(

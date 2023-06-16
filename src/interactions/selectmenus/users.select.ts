@@ -19,8 +19,9 @@ export class UserSelect extends SelectMenu {
     });
 
     const users = guildData!.pickableUsers;
-    users.push(...values);
-
+    for (const value of values) {
+      if (!users.includes(value)) users.push(value);
+    }
     await UpdateGuild(guild!, {
       pickableUsers: users,
     });

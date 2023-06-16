@@ -29,15 +29,20 @@ export class WhosThatCommand extends Command {
 
     const config = require("src/config.ts");
     if (!guildData?.pickableUsers) {
-      return interaction.followUp({
+      return interaction.editReply({
         content: whosthat.noPickableUsers,
-        ephemeral: true,
       });
     }
 
-    await SendMessageToPickerChannel(this.client, interaction, guildData, lang);
+    const error = await SendMessageToPickerChannel(
+      this.client,
+      interaction,
+      guildData,
+      lang
+    );
+    if (error) return;
 
-    return interaction.followUp({
+    return interaction.editReply({
       content: eval(whosthat.response),
     });
   }

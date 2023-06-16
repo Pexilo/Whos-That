@@ -1,4 +1,3 @@
-import IGuild from "@models/IGuild";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -8,8 +7,6 @@ import {
   Guild,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { ShewenyClient } from "sheweny";
-import { SendMessageToPickerChannel } from "./sender";
 const { UserData } = require("../db/index");
 const { GuildData } = require("../db/index");
 
@@ -61,20 +58,25 @@ export async function CreateGuild(guild: Guild) {
     .save()
     .then(() =>
       console.log(
-        `âž• Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
+        `➕• Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
       )
     );
+  return createGuild;
 }
 
 export async function CreateUser(userId: string, guild: Guild) {
-  const userData = new UserData({ id: userId, guilds: [guild.id] });
+  const userData = new UserData({
+    id: userId,
+    guilds: [guild.id],
+    points: { guildId: guild.id, score: 0 },
+  });
   userData.save();
 }
 
 export async function DeleteGuild(guild: Guild) {
   await GuildData.deleteOne({ id: guild.id }).then(() =>
     console.log(
-      `âž– Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
+      `➖– Guild: ${guild.name} - ${guild.id} - ${guild.members.cache.size} users`
     )
   );
 }
@@ -84,8 +86,8 @@ export async function DeleteUser(userId: string) {
 }
 
 export async function FetchGuild(guild: Guild) {
-  const data = await GuildData.findOne({ id: guild.id });
-  if (!data) await CreateGuild(guild);
+  let data = await GuildData.findOne({ id: guild.id });
+  if (!data) data = await CreateGuild(guild);
   return data;
 }
 
@@ -118,18 +120,22 @@ export async function UpdateUser(userId: string, guild: Guild, data: any) {
   return userData.save();
 }
 
-export function FormatToDcDate(date: Date) {
+type DateFormat = "DD/MM/YYYY" | "MM/DD/YYYY";
+export function FormatToDcDate(date: Date, format: DateFormat) {
   const day = ("0" + date.getDate()).slice(-2);
   const month = ("0" + (date.getMonth() + 1)).slice(-2);
   const year = date.getFullYear();
   const hours = ("0" + date.getHours()).slice(-2);
   const minutes = ("0" + date.getMinutes()).slice(-2);
-  const dateDDMMYYYYHHM = `${day}/${month}/${year} ${hours}:${minutes}`;
-  return dateDDMMYYYYHHM;
+  let DateString =
+    format === "DD/MM/YYYY"
+      ? `${day}/${month}/${year}`
+      : `${month}/${day}/${year}`;
+  DateString += ` ${hours}:${minutes}`;
+  return DateString;
 }
 
 export async function FetchAndGetLang(guild: Guild) {
   const guildData = await FetchGuild(guild);
-  if (guildData) return { guildData, lang: guildData.language };
-  else return { guildData: null, lang: "en" };
+  return { guildData, lang: guildData.language };
 }

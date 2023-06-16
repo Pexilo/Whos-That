@@ -59,7 +59,7 @@ export class LanguageCommand extends Command {
       language: lang,
     });
 
-    return interaction.followUp({
+    return interaction.editReply({
       content: language.response,
     });
   }

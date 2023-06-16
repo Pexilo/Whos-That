@@ -1,6 +1,6 @@
 import IUser from "@models/IUser";
 import { GetLeaderboard } from "@utils/generate-leaderboard";
-import { Defer, FetchUsersFromGuild } from "@utils/shortcuts";
+import { Defer, FetchAndGetLang, FetchUsersFromGuild } from "@utils/shortcuts";
 import { type ButtonInteraction } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { Button } from "sheweny";

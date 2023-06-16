@@ -1,4 +1,4 @@
-import IWTRes from "@models/IWTRes";
+import IUser from "@models/IUser";
 import LanguageManager from "@utils/language-manager";
 import {
   Defer,
@@ -6,10 +6,19 @@ import {
   FetchUser,
   UpdateUser,
 } from "@utils/shortcuts";
-import { StringSelectMenuInteraction, TextChannel } from "discord.js";
+import { Guild, StringSelectMenuInteraction, TextChannel } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { SelectMenu } from "sheweny";
 
+type WhosThatResponded = {
+  guildId: string;
+  messageId: string;
+  correct: boolean;
+};
+type pointsArray = {
+  guildId: string;
+  score: number;
+};
 export class WhosThatSelect extends SelectMenu {
   constructor(client: ShewenyClient) {
     super(client, [/whosthat-select_.*/]);
@@ -22,7 +31,7 @@ export class WhosThatSelect extends SelectMenu {
     const authorId = selectMenu.customId.split("_")[1];
     const messageId = selectMenu.customId.split("_")[2];
 
-    const userData = await FetchUser(selectMenu.user.id, guild!);
+    let userData: IUser = await FetchUser(selectMenu.user.id, guild!);
     const { guildData, lang } = await FetchAndGetLang(guild!);
     const languageManager = new LanguageManager();
     const whosThatSelect =
@@ -42,39 +51,62 @@ export class WhosThatSelect extends SelectMenu {
         content: whosThatSelect.fetchMsgErr,
       });
 
-    const messageAlreadyResponded = userData.whosThatResponded.find(
-      (r: IWTRes) => r.id === messageId
-    );
-    if (messageAlreadyResponded && messageAlreadyResponded.id === messageId)
+    if (
+      messageId ===
+      userData.whosThatResponded.find(
+        (res: WhosThatResponded) => res.messageId === messageId
+      )?.messageId
+    )
       return selectMenu.editReply({
         content: eval(whosThatSelect.alreadyResponded),
       });
 
     const whosthatRes = [
       ...userData.whosThatResponded,
-      { id: messageId, correct: authorId === values[0] },
+      { guildId: guild!.id, messageId, correct: authorId === values[0] },
     ];
     await UpdateUser(user.id, guild!, {
       whosThatResponded: whosthatRes,
     });
+    let gameScore = 1; // 1 participation point
 
     if (authorId === values[0]) {
-      await UpdateUser(user.id, guild!, {
-        points: userData!.points + 2,
-      });
-
-      const totalPoints = userData!.points + 2;
+      gameScore += 1; // 1 point for correct answer
+      const totalPoints = await UpdateScore(
+        user.id,
+        userData,
+        gameScore,
+        guild!
+      );
       return selectMenu.editReply({
         content: eval(whosThatSelect.rightAnswerRes),
       });
-    } else {
-      await UpdateUser(user.id, guild!, {
-        points: userData!.points + 1,
-      });
-
-      return selectMenu.editReply({
-        content: eval(whosThatSelect.wrongAnswerRes),
-      });
     }
+
+    const totalPoints = await UpdateScore(user.id, userData, gameScore, guild!);
+    return selectMenu.editReply({
+      content: eval(whosThatSelect.wrongAnswerRes),
+    });
   }
+}
+
+async function UpdateScore(
+  userId: string,
+  userData: IUser,
+  gameScore: number,
+  guild: Guild
+) {
+  const pointsArray = userData!.points.find(
+    (p: pointsArray) => p.guildId === guild!.id
+  )!;
+  if (pointsArray) {
+    const index = userData!.points.indexOf(pointsArray);
+    userData!.points.splice(index, 1);
+  }
+  const totalPoints = pointsArray.score + gameScore;
+  await UpdateUser(userId, guild!, {
+    points: [...userData!.points, { guildId: guild!.id, score: totalPoints }],
+  });
+
+  return totalPoints;
 }
