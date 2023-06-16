@@ -1,4 +1,6 @@
-import { Interaction } from "discord.js";
+import LanguageManager from "@utils/language-manager";
+import { Defer, FetchAndGetLang } from "@utils/shortcuts";
+import { CommandInteraction } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { Event } from "sheweny";
 
@@ -10,13 +12,17 @@ export class UserMissingPermissionsListener extends Event {
     });
   }
 
-  async execute(interaction: Interaction) {
-    // const { guild } = interaction;
-    // const { lang } = await this.client.FetchAndGetLang(guild);
-    // const { userMissingPermissions } = this.client.la[lang].events.permissions;
-    // interaction.reply({
-    //   content: eval(userMissingPermissions.reply),
-    //   ephemeral: true,
-    // });
+  async execute(interaction: CommandInteraction, missing: any) {
+    const { guild } = interaction;
+    await Defer(interaction);
+
+    const { lang } = await FetchAndGetLang(guild!);
+    const languageManager = new LanguageManager();
+    const userMissingPermissions =
+      languageManager.getEventTranslation(lang).userMissingPermissions;
+
+    return await interaction.followUp({
+      content: eval(userMissingPermissions.response),
+    });
   }
 }

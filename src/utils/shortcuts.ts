@@ -1,3 +1,4 @@
+import IGuild from "@models/IGuild";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -115,18 +116,6 @@ export async function UpdateUser(userId: string, guild: Guild, data: any) {
     if (userData[key] !== data[key]) userData[key] = data[key];
   }
   return userData.save();
-}
-
-export function ScheduleFunction(client: ShewenyClient) {
-  setInterval(function () {
-    var currentDate = new Date();
-    if (
-      currentDate.getHours() === (10 || 14) &&
-      currentDate.getMinutes() === 0
-    ) {
-      SendMessageToPickerChannel(client);
-    }
-  }, 60 * 60 * 1000);
 }
 
 export function FormatToDcDate(date: Date) {

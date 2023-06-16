@@ -1,4 +1,3 @@
-import { ScheduleFunction } from "@utils/shortcuts";
 import { IntentsBitField, Partials, PermissionFlagsBits } from "discord.js";
 import { ShewenyClient } from "sheweny";
 import config from "./config";
@@ -48,7 +47,5 @@ mongoose
   })
   .then(() => console.log("✅ MongoDB"))
   .catch((err: Error) => console.error("❌ MongoDB\n", err.reason));
-
-ScheduleFunction(client);
 
 client.login(config.DISCORD_TOKEN);

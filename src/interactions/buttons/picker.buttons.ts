@@ -1,6 +1,7 @@
-import IGuild from "@models/IGuild";
 import GenerateDiscordMessage from "@utils/generate-image";
-import { Defer, Embed, FetchGuild } from "@utils/shortcuts";
+import LanguageManager from "@utils/language-manager";
+import { SendMessageToPickerChannel } from "@utils/sender";
+import { Defer, Embed, FetchAndGetLang } from "@utils/shortcuts";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -12,7 +13,6 @@ import {
 } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { Button } from "sheweny";
-import { SendMessageToPickerChannel } from "@utils/sender";
 const { randoSequence } = require("@nastyox/rando.js");
 
 export class WhosThatMesageButtons extends Button {
@@ -21,20 +21,18 @@ export class WhosThatMesageButtons extends Button {
   }
 
   async execute(button: ButtonInteraction) {
-    if (!(await Defer(button))) return;
-
     const { guild } = button;
-    const guildData: IGuild = await FetchGuild(guild!);
-    if (!guildData)
-      return button.editReply({
-        content: "An error occured. Could not fetch guild data.",
-      });
+    await Defer(button);
 
-    //Refresh button
+    const { guildData, lang } = await FetchAndGetLang(guild!);
+    const languageManager = new LanguageManager();
+    const whosThatMsgBtns =
+      languageManager.getInterractionTranslation(lang).whosThatMsgBtns;
+
     if (button.customId === "picker_refresh") {
-      SendMessageToPickerChannel(this.client);
+      await SendMessageToPickerChannel(this.client, button, guildData, lang);
       return button.editReply({
-        content: "🔁 Picker refreshed.",
+        content: whosThatMsgBtns.refreshResponse,
       });
     }
 
@@ -42,26 +40,26 @@ export class WhosThatMesageButtons extends Button {
     const authorId = button.customId.split("_")[2];
 
     const sourceChannel = (await guild!.channels.fetch(
-      guildData.sourceChannel
+      guildData!.sourceChannel
     )) as TextChannel;
     const message = await sourceChannel.messages.fetch(messageId);
     if (!message)
       return button.editReply({
-        content: "An error occured. Could not fetch message.",
+        content: whosThatMsgBtns.fetchMsgErr,
       });
 
-    const { attachment, content } = await GenerateDiscordMessage(message);
+    const { attachment, content } = await GenerateDiscordMessage(message, lang);
 
     const whosThatChannel = (await guild!.channels.fetch(
-      guildData.whosThatChannel
+      guildData!.whosThatChannel
     )) as TextChannel;
     if (!whosThatChannel)
       return button.editReply({
-        content: "An error occured. Could not fetch whosThatChannel.",
+        content: whosThatMsgBtns.fetchWTCErr,
       });
 
     const embed = Embed()
-      .setTitle("Whos that?")
+      .setTitle(whosThatMsgBtns.title)
       .setAuthor({
         name: guild!.name,
         iconURL: guild!.iconURL()!,
@@ -70,7 +68,7 @@ export class WhosThatMesageButtons extends Button {
       .setTimestamp();
     if (content.length > 150) embed.setDescription(content);
 
-    let userToPick = guildData.pickableUsers.filter(
+    let userToPick = guildData!.pickableUsers.filter(
       (u: string) => u !== authorId
     );
 
@@ -91,7 +89,7 @@ export class WhosThatMesageButtons extends Button {
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId(`whosthat-select_${authorId}_${messageId}`)
-          .setPlaceholder("C'est qui ?")
+          .setPlaceholder(whosThatMsgBtns.placeholder)
           .addOptions(
             GuildMembers.map((m) =>
               new StringSelectMenuOptionBuilder()
@@ -105,7 +103,7 @@ export class WhosThatMesageButtons extends Button {
     const leaderboardBtn = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(`whosthat-leaderboard_${messageId}`)
-        .setLabel("Classement")
+        .setLabel(whosThatMsgBtns.label)
         .setStyle(ButtonStyle.Secondary)
         .setEmoji("🏆")
     );
@@ -118,7 +116,7 @@ export class WhosThatMesageButtons extends Button {
       })
       .then(async (msg) => {
         button.editReply({
-          content: `✅ Message sent ${msg.url}`,
+          content: eval(whosThatMsgBtns.response),
         });
       });
   }

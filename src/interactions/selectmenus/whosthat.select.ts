@@ -1,6 +1,11 @@
-import IGuild from "@models/IGuild";
 import IWTRes from "@models/IWTRes";
-import { Defer, FetchGuild, FetchUser, UpdateUser } from "@utils/shortcuts";
+import LanguageManager from "@utils/language-manager";
+import {
+  Defer,
+  FetchAndGetLang,
+  FetchUser,
+  UpdateUser,
+} from "@utils/shortcuts";
 import { StringSelectMenuInteraction, TextChannel } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { SelectMenu } from "sheweny";
@@ -11,30 +16,30 @@ export class WhosThatSelect extends SelectMenu {
   }
 
   async execute(selectMenu: StringSelectMenuInteraction) {
-    if (!(await Defer(selectMenu))) return;
-
     const { values, guild, user } = selectMenu;
+    await Defer(selectMenu);
 
     const authorId = selectMenu.customId.split("_")[1];
     const messageId = selectMenu.customId.split("_")[2];
-    if (!authorId || !messageId) return;
 
     const userData = await FetchUser(selectMenu.user.id, guild!);
-    const guildData: IGuild = await FetchGuild(guild!);
-    if (!guildData || !userData) return;
+    const { guildData, lang } = await FetchAndGetLang(guild!);
+    const languageManager = new LanguageManager();
+    const whosThatSelect =
+      languageManager.getInterractionTranslation(lang).whosThatSelect;
 
     const sourceChannel = (await guild!.channels.fetch(
-      guildData.sourceChannel
+      guildData!.sourceChannel
     )) as TextChannel;
     if (!sourceChannel)
       return selectMenu.editReply({
-        content: "An error occured. Could not fetch sourceChannel.",
+        content: whosThatSelect.fetchSourceErr,
       });
 
     const message = await sourceChannel.messages.fetch(messageId);
     if (!message)
       return selectMenu.editReply({
-        content: "An error occured. Could not fetch message.",
+        content: whosThatSelect.fetchMsgErr,
       });
 
     const messageAlreadyResponded = userData.whosThatResponded.find(
@@ -42,7 +47,7 @@ export class WhosThatSelect extends SelectMenu {
     );
     if (messageAlreadyResponded && messageAlreadyResponded.id === messageId)
       return selectMenu.editReply({
-        content: `⛔ Vous avez déjà répondu !\nLa réponse était <@${authorId}> ! ${message.url}\n\n> Points: \`${userData.points}\` points`,
+        content: eval(whosThatSelect.alreadyResponded),
       });
 
     const whosthatRes = [
@@ -58,12 +63,9 @@ export class WhosThatSelect extends SelectMenu {
         points: userData!.points + 2,
       });
 
+      const totalPoints = userData!.points + 2;
       return selectMenu.editReply({
-        content: `<a:cocoDance:1055513979960696892> Bonne réponse !\nLa personne qui a envoyé le message est <@${authorId}> ! ${
-          message.url
-        }\n\n> \`+1\` point de participation\n> \`+1\` point de bonne réponse\n> Total: \`${
-          userData!.points + 2
-        }\` points`,
+        content: eval(whosThatSelect.rightAnswerRes),
       });
     } else {
       await UpdateUser(user.id, guild!, {
@@ -71,11 +73,7 @@ export class WhosThatSelect extends SelectMenu {
       });
 
       return selectMenu.editReply({
-        content: `⛔ Mauvaise réponse !\nLa réponse était <@${authorId}> ! ${
-          message.url
-        }\n\n> \`+1\` point de participation\n> Total: \`${
-          userData!.points + 1
-        }\` points`,
+        content: eval(whosThatSelect.wrongAnswerRes),
       });
     }
   }

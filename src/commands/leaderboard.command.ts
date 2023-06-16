@@ -1,5 +1,6 @@
+import IUser from "@models/IUser";
 import { GetLeaderboard } from "@utils/generate-leaderboard";
-import { Defer, FetchUsersFromGuild } from "@utils/shortcuts";
+import { Defer, FetchAndGetLang, FetchUsersFromGuild } from "@utils/shortcuts";
 import type { CommandInteraction } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { Command } from "sheweny";
@@ -23,7 +24,9 @@ export class LeaderboardCommand extends Command {
     const { guild } = interaction;
     await Defer(interaction);
 
-    const usersData = await FetchUsersFromGuild(guild!);
-    GetLeaderboard(usersData, interaction);
+    const usersData: IUser[] = await FetchUsersFromGuild(guild!);
+    const { lang } = await FetchAndGetLang(guild!);
+
+    GetLeaderboard(usersData, interaction, lang);
   }
 }

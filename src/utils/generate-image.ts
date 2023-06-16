@@ -1,12 +1,16 @@
 import { GlobalFonts } from "@napi-rs/canvas";
 import { AttachmentBuilder, Message } from "discord.js";
 import { join } from "path";
+import LanguageManager from "./language-manager";
 import { FormatToDcDate, Truncate } from "./shortcuts";
 import Vibrant = require("node-vibrant");
 
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 
-async function GenerateDiscordMessage(message: Message) {
+async function GenerateDiscordMessage(message: Message, lang: string) {
+  const languageManager = new LanguageManager();
+  const generateImage = languageManager.getUtilsTranslation(lang).generateImage;
+
   const date = new Date();
   const dateStr = `${date.getFullYear()}-${
     date.getMonth() + 1
@@ -39,7 +43,7 @@ async function GenerateDiscordMessage(message: Message) {
   ctx.strokeRect(0, 0, canvas.width, canvas.height);
   ctx.font = "30px 'GGSans', 'sans-serif', 'NotoEmoji'";
   ctx.fillStyle = userNameHex;
-  ctx.fillText("Utilisateur", 200, 105);
+  ctx.fillText(generateImage.user, 200, 105);
   ctx.fillStyle = "#e4e6e8";
   ctx.fillText(
     LineBreak(ctx, Truncate(message.content, 150), 200, 150, 550, 40),
@@ -64,7 +68,7 @@ async function GenerateDiscordMessage(message: Message) {
 
   //Attachment
   const attachment = new AttachmentBuilder(await canvas.encode("png"), {
-    name: "profile-image.png",
+    name: "discord_message.png",
   });
 
   //Save image

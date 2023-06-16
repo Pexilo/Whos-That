@@ -23,11 +23,19 @@ export class WhosThatCommand extends Command {
     const { guild } = interaction;
     await Defer(interaction);
 
-    const { lang } = await FetchAndGetLang(guild!);
+    const { guildData, lang } = await FetchAndGetLang(guild!);
     const languageManager = new LanguageManager();
     const whosthat = languageManager.getCommandTranslation(lang).whosthat;
 
-    await SendMessageToPickerChannel(this.client);
+    const config = require("src/config.ts");
+    if (!guildData?.pickableUsers) {
+      return interaction.followUp({
+        content: whosthat.noPickableUsers,
+        ephemeral: true,
+      });
+    }
+
+    await SendMessageToPickerChannel(this.client, interaction, guildData, lang);
 
     return interaction.followUp({
       content: eval(whosthat.response),

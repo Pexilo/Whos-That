@@ -1,14 +1,16 @@
 import IGuild from "@models/IGuild";
+import LanguageManager from "@utils/language-manager";
 import { Embed } from "@utils/shortcuts";
 import {
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   Collection,
+  CommandInteraction,
   Message,
   TextChannel,
 } from "discord.js";
 import { ShewenyClient } from "sheweny";
-const { GuildData } = require("../db/index");
 
 const NumberToEmoji = [
   "1️⃣",
@@ -23,112 +25,121 @@ const NumberToEmoji = [
   "🔟",
 ];
 
-export const SendMessageToPickerChannel = async (client: ShewenyClient) => {
-  const guilds = await GuildData.find();
-  guilds.forEach(async (guild: IGuild) => {
-    if (
-      !guild.sourceChannel ||
-      !guild.pickerChannel ||
-      !guild.whosThatChannel ||
-      !guild.checkpoints ||
-      guild.pickableUsers.length < 1
-    )
-      return;
+export const SendMessageToPickerChannel = async (
+  client: ShewenyClient,
+  interaction: CommandInteraction | ButtonInteraction,
+  guildData: IGuild,
+  lang: string
+) => {
+  const { guild } = interaction;
 
-    const currentGuild = await client.guilds.fetch(guild.id);
-    const sourceChannel = (await client.channels.fetch(
-      guild.sourceChannel
-    )) as TextChannel;
-    const pickerChannel = (await currentGuild.channels.fetch(
-      guild.pickerChannel
-    )) as TextChannel;
-    if (!currentGuild) return;
+  const languageManager = new LanguageManager();
+  const sender = languageManager.getUtilsTranslation(lang).sender;
+  const config = require("src/config.ts");
 
-    const randomCheckpoints = guild.checkpoints
-      .sort(() => Math.random() - 0.5)
-      .splice(0, 2);
-
-    const randomMessages: Message<true>[] = [];
-
-    for (const checkpoint of randomCheckpoints) {
-      const msg = (
-        await FindMessagesFromCheckpoint(sourceChannel, checkpoint, guild)
-      ).random(5);
-      randomMessages.push(...msg);
-    }
-
-    const randMessagesYears = GetMessageYears(randomMessages);
-
-    let buttons: ButtonBuilder[] = [];
-    randomMessages.map((message, i) => {
-      buttons.push(
-        new ButtonBuilder()
-          .setCustomId(`picker_${message.id}_${message.author.id}`)
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji(`${NumberToEmoji[i]}`)
-      );
+  if (
+    !guildData.sourceChannel ||
+    !guildData.pickerChannel ||
+    !guildData.whosThatChannel ||
+    !guildData.checkpoints ||
+    guildData.pickableUsers.length < 1
+  )
+    return interaction.editReply({
+      content: eval(sender.noDataErr),
     });
 
-    //send message to picker channel
-    pickerChannel.send({
-      embeds: [
-        Embed()
-          .setTitle("Who's that?")
-          .setDescription(
-            `Pick the message to send to <#${guild.whosThatChannel}>`
-          )
-          .addFields(
-            randomMessages.map((message, i) => {
-              return {
-                name: `${NumberToEmoji[i]}`,
-                value: message.content,
-              };
-            })
-          )
-          .setFooter({
-            text: `from ${randMessagesYears}`,
-            iconURL: client.user?.displayAvatarURL(),
+  const sourceChannel = (await guild!.channels.fetch(
+    guildData.sourceChannel
+  )) as TextChannel;
+  const pickerChannel = (await guild!.channels.fetch(
+    guildData.pickerChannel
+  )) as TextChannel;
+  if (!sourceChannel || !pickerChannel)
+    return interaction.editReply({
+      content: sender.fetchChannelErr,
+    });
+
+  const randomCheckpoints = guildData.checkpoints
+    .sort(() => Math.random() - 0.5)
+    .splice(0, 2);
+
+  const randomMessages: Message<true>[] = [];
+  for (const checkpoint of randomCheckpoints) {
+    const msg = (
+      await FindMessagesFromCheckpoint(sourceChannel, checkpoint, guildData)
+    ).random(5);
+    randomMessages.push(...msg);
+  }
+
+  const randMessagesYears = GetMessageYears(randomMessages);
+
+  let buttons: ButtonBuilder[] = [];
+  randomMessages.map((message, i) => {
+    buttons.push(
+      new ButtonBuilder()
+        .setCustomId(`picker_${message.id}_${message.author.id}`)
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji(`${NumberToEmoji[i]}`)
+    );
+  });
+
+  //send message to picker channel
+  pickerChannel.send({
+    embeds: [
+      Embed()
+        .setTitle(sender.title)
+        .setDescription(eval(sender.description))
+        .addFields(
+          randomMessages.map((message, i) => {
+            return {
+              name: `${NumberToEmoji[i]}`,
+              value: message.content,
+            };
           })
-          .setTimestamp(),
-      ],
-      components: [
-        {
-          type: 1,
-          components:
-            buttons.length >= 5
-              ? buttons.slice(0, 5)
-              : [
-                  new ButtonBuilder()
-                    .setCustomId("button-disable2")
-                    .setEmoji("❌")
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(true),
-                ],
-        },
-        {
-          type: 1,
-          components:
-            buttons.length > 5
-              ? buttons.slice(5, buttons.length)
-              : [
-                  new ButtonBuilder()
-                    .setCustomId("button-disable1")
-                    .setEmoji("❌")
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(true),
-                ],
-        },
-        {
-          type: 1,
-          components: [
-            new ButtonBuilder()
-              .setCustomId(`picker_refresh`)
-              .setStyle(ButtonStyle.Secondary)
-              .setEmoji("🔁"),
-          ],
-        },
-      ],
-    });
+        )
+        .setFooter({
+          text: eval(sender.footer),
+          iconURL: client.user?.displayAvatarURL(),
+        })
+        .setTimestamp(),
+    ],
+    components: [
+      {
+        type: 1,
+        components:
+          buttons.length > 1
+            ? buttons.slice(0, buttons.length < 5 ? buttons.length : 5)
+            : [
+                new ButtonBuilder()
+                  .setCustomId("button-disable2")
+                  .setEmoji("❌")
+                  .setStyle(ButtonStyle.Secondary)
+                  .setDisabled(true),
+              ],
+      },
+      {
+        type: 1,
+        components:
+          buttons.length > 5
+            ? buttons.slice(5, buttons.length)
+            : [
+                new ButtonBuilder()
+                  .setCustomId("button-disable1")
+                  .setEmoji("❌")
+                  .setStyle(ButtonStyle.Secondary)
+                  .setDisabled(true),
+              ],
+      },
+      {
+        type: 1,
+        components: [
+          new ButtonBuilder()
+            .setCustomId(`picker_refresh`)
+            .setStyle(ButtonStyle.Secondary)
+            .setEmoji("🔁"),
+        ],
+      },
+    ],
   });
 };
 

@@ -1,4 +1,5 @@
 import IUser from "@models/IUser";
+import LanguageManager from "@utils/language-manager";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -21,9 +22,16 @@ type LeaderboardUser = {
 async function GetLeaderboard(
   usersData: IUser[],
   interaction: ButtonInteraction | CommandInteraction,
+  lang: string,
   messageId?: string,
   page?: number
 ) {
+  const languageManager = new LanguageManager();
+  const generateLeaderboard =
+    languageManager.getUtilsTranslation(lang).generateLeaderboard;
+
+  const { guild } = interaction;
+
   const sortedUsers = usersData
     .filter((user: { points: number }) => user.points > 0)
     .sort(
@@ -41,7 +49,7 @@ async function GetLeaderboard(
         previousUser && previousUser.points === currentUser.points
           ? previousPosition
           : previousPosition + 1,
-      user: interaction.guild!.members.cache.get(user.id),
+      user: guild!.members.cache.get(user.id),
       points: user.points,
       whosThatResponded: user.whosThatResponded.filter(
         (whosThatResponded: { id: string }) =>
@@ -58,7 +66,7 @@ async function GetLeaderboard(
 
   if (!user)
     return interaction.editReply({
-      content: "An error occurred. Could not fetch user.",
+      content: generateLeaderboard.fetchUserErr,
     });
 
   const userIndex = users.indexOf(user);
@@ -68,12 +76,12 @@ async function GetLeaderboard(
   const userRankLastDigit = userRankString[userRankString.length - 1];
   const userRankSuffix =
     userRankLastDigit === "1"
-      ? "st"
+      ? generateLeaderboard.st
       : userRankLastDigit === "2"
-      ? "nd"
+      ? generateLeaderboard.nd
       : userRankLastDigit === "3"
-      ? "rd"
-      : "th";
+      ? generateLeaderboard.rd
+      : generateLeaderboard.th;
 
   const rankEmoji = ["🥇", "🥈", "🥉"];
 
@@ -84,19 +92,21 @@ async function GetLeaderboard(
   const userPoints = user.points;
   const userPointsString = userPoints.toString();
   const userPointsLastDigit = userPointsString[userPointsString.length - 1];
-  const userPointsSuffix = userPointsLastDigit === "1" ? "point" : "points";
-
-  const userPointsText = `${userPoints} ${userPointsSuffix}`;
+  const userPointsSuffix =
+    userPointsLastDigit === "1"
+      ? generateLeaderboard.point
+      : generateLeaderboard.points;
 
   // Split users into multiple pages with a page size of 10
   const pageSize = 10;
   const totalPages = Math.ceil(users.length / pageSize);
   const currentPage = page ? page : Math.floor(userIndex / pageSize) + 1;
 
+  const userPointsText = `${userPoints} ${userPointsSuffix}`;
   const embed = Embed()
     .setAuthor({
-      name: `Leaderboard for ${interaction.guild!.name}`,
-      iconURL: interaction.guild!.iconURL()!,
+      name: eval(generateLeaderboard.author),
+      iconURL: guild!.iconURL()!,
     })
     .setDescription(
       users
@@ -107,7 +117,9 @@ async function GetLeaderboard(
               user.position + 1 < 4
                 ? rankEmoji[user.position]
                 : `${user.position + 1}.`
-            } **${user.user?.user}** — \`${user.points}\` points ${
+            } **${user.user?.user}** — \`${user.points}\` ${
+              generateLeaderboard.points
+            } ${
               user.whosThatResponded.length > 0
                 ? user.whosThatResponded[0].correct
                   ? "✅"
@@ -118,7 +130,7 @@ async function GetLeaderboard(
         .join("\n")
     )
     .setFooter({
-      text: `Page ${currentPage}/${totalPages} | You are ${userRankText} with ${userPointsText}.`,
+      text: eval(generateLeaderboard.footer),
       iconURL: interaction.user.displayAvatarURL(),
     });
 
@@ -161,7 +173,13 @@ async function GetLeaderboard(
       } catch (error) {}
       collector.stop();
       if (currentPage > 1) {
-        GetLeaderboard(usersData, interaction, messageId, currentPage - 1);
+        GetLeaderboard(
+          usersData,
+          interaction,
+          lang,
+          messageId,
+          currentPage - 1
+        );
       }
     } else if (i.customId === "next-leaderboard") {
       // Go to the next page
@@ -170,7 +188,13 @@ async function GetLeaderboard(
       } catch (error) {}
       collector.stop();
       if (currentPage < totalPages) {
-        GetLeaderboard(usersData, interaction, messageId, currentPage + 1);
+        GetLeaderboard(
+          usersData,
+          interaction,
+          lang,
+          messageId,
+          currentPage + 1
+        );
       }
     }
   });

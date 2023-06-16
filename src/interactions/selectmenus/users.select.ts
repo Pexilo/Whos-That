@@ -11,7 +11,6 @@ export class UserSelect extends SelectMenu {
 
   async execute(selectMenu: StringSelectMenuInteraction) {
     const { values, guild } = selectMenu;
-
     selectMenu.deferUpdate();
 
     const guildData: IGuild = await FetchGuild(guild!);

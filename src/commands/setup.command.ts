@@ -59,7 +59,7 @@ export class WhosThatSetupCommand extends Command {
           required: true,
         },
       ],
-      clientPermissions: ["ViewChannel", "ManageChannels"],
+      clientPermissions: ["ViewChannel", "SendMessages", "EmbedLinks"],
       userPermissions: ["ManageGuild"],
     });
   }
@@ -74,11 +74,16 @@ export class WhosThatSetupCommand extends Command {
 
     const languageManager = new LanguageManager();
     const setup = languageManager.getCommandTranslation(lang).setup;
+    const config = require("src/config.ts");
 
     if (guildData?.checkpoints?.length === 0) {
       const approxMsgs =
-        (await fetchChannelCheckpoints(sourceChannel, guild!, interaction)) *
-        100;
+        (await fetchChannelCheckpoints(
+          sourceChannel,
+          guild!,
+          interaction,
+          lang
+        )) * 100;
 
       interaction.editReply({
         content: eval(setup.processed),

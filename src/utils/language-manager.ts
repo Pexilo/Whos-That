@@ -40,6 +40,33 @@ class LanguageManager {
     }
   }
 
+  getInterractionTranslation(lang: string): ITranslations["interactions"] {
+    const translations = this.translations[lang];
+    if (translations && translations["interactions"]) {
+      return translations["interactions"];
+    } else {
+      return this.translations["en"]["interactions"];
+    }
+  }
+
+  getEventTranslation(lang: string): ITranslations["events"] {
+    const translations = this.translations[lang];
+    if (translations && translations["events"]) {
+      return translations["events"];
+    } else {
+      return this.translations["en"]["events"];
+    }
+  }
+
+  getUtilsTranslation(lang: string): ITranslations["utils"] {
+    const translations = this.translations[lang];
+    if (translations && translations["utils"]) {
+      return translations["utils"];
+    } else {
+      return this.translations["en"]["utils"];
+    }
+  }
+
   getAllTranslations(lang: string): Translations {
     return this.translations[lang];
   }
