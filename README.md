@@ -179,7 +179,7 @@ git clone https://github.com/Pexilo/Whos-That
 
 1. Replace content of `example.env`
 
-```
+```sh
 DISCORD_TOKEN=your-bot-token
 MONGO_URI=your-mongo-db-connection-string
 ```
@@ -188,9 +188,11 @@ MONGO_URI=your-mongo-db-connection-string
 
 ##### 📜 CONFIG
 
-`src/congig.ts`
+`src/config.ts`
 
-```
+Edit commented lines
+
+```ts
 import * as dotenv from "dotenv";
 dotenv.config();
 
