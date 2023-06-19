@@ -18,7 +18,9 @@
 
 ## ❓ About Who's That
 
-Who's That was born from my desire to infuse my primary Discord hangout server with fun and interactivity. In a server filled with quirky and occasionally borderlines convos, I had the idea of adding a guessing game element to spice things up. <br />So, over the course of a weekend, I brought this concept to life.<br />This particular bot is just one of the many Discord bots I've created. I believe that sharing it would please some people servers, so here you go!
+Who's That was born from my desire to infuse my primary Discord hangout server with fun and interactivity. In a server filled with quirky and occasionally borderlines convos, I had the idea of adding a guessing game element to spice things up.  
+So, over the course of a weekend, I brought this concept to life.  
+This particular bot is just one of the many Discord bots I've created. I believe that sharing it would please some people servers, so here you go!
 
 ## ✨ What's the bot doin
 
@@ -30,9 +32,9 @@ Pick carefully the best message 😎
 
 <img src="https://github.com/Pexilo/Whos-That/assets/67436391/006f7dbf-1b68-403b-9f82-c8c8c83f5991"  width="450" height="500">
 
-When typing `/whosthat` you will be prompt with `1` to `10` random messages.
-You can pick your desired message with the corresponding button, or reload messages with the 🔁 button.<br />
-Author is not visible so you can also play the game. 😎 <br />
+When typing `/whosthat` you will be prompt with `1` to `10` random messages.  
+You can pick your desired message with the corresponding button, or reload messages with the 🔁 button.  
+Author is not visible so you can also play the game. 😎   
 The picked message will be sent to the _Who's That_ channel.
 
 ### 2️⃣ Who's That message preview
@@ -49,10 +51,10 @@ Challenge your friends 🏆
 
 <img src="https://github.com/Pexilo/Whos-That/assets/67436391/91b9660b-6b08-4375-a4e1-c5b27191982e"  width="300" height="180">
 
-Leaderboard will show **total points**, **correct answers**, **position**.
-_Point rules:_
-`+1` point for participating
-`+1` point for correctly guessing
+Leaderboard will show **total points**, **correct answers**, **position**.  
+_Point rules:_  
+`+1` point for participating  
+`+1` point for correctly guessing  
 _This is subject to change._
 
 ## Make sure to `/setup` your server first 🥶
@@ -63,16 +65,16 @@ _This is subject to change._
 
 **Target:** channel where to **fetch** messages from.  
 **Picker:** channel where to **pick** message from.  
-**Who's That:** channel where to **send** message to.  
+**Who's That:** channel where to **send** message to.
 
-> Make sure to lock the **Who's That** channel to make it view only to keep it clean, 
+> Make sure to lock the **Who's That** channel to make it view only to keep it clean,  
 > and make the **Picker** channel private.
 
 After setting up the channels, you will be prompt to pick users 👥
 
 <img src="https://github.com/Pexilo/Whos-That/assets/67436391/5db6f41e-499c-4f95-a235-d42de7aa9fc3"  width="400" height="140">
 
-Picking users will filter the messages to only show the selected users messages. <br />
+Picking users will filter the messages to only show the selected users messages.  
 Select as many users as you want.
 
 > You can change the users list with `/users` command at any time.
@@ -84,26 +86,26 @@ You can begin with `/whosthat` command.
 
 ### 📥 Fetching messages
 
-Target channel will fetch message Ids called "checkpoints" (each 100 messages) to avoid fetching all messages at once. 
-For example, if you have 1000 messages in your target channel, the bot will fetch 10 checkpoints (100 messages each) and add them to a list. 
-From my experience, fetching 100 000 messages takes roughly 15–20 minutes. 
+Target channel will fetch message Ids called "checkpoints" (each 100 messages) to avoid fetching all messages at once.  
+For example, if you have 1000 messages in your target channel, the bot will fetch 10 checkpoints (100 messages each) and add them to a list.  
+From my experience, fetching 100 000 messages takes roughly 15–20 minutes.
 
-When you request Who's That messages to pick, the bot will randomly pick 2 checkpoints from the list, and fetch 100 messages from the checkpoint. 
-Then, the bot will randomly pick 5 messages from each checkpoint, and send them to the picker channel. Take note that the bot will filter messages along the process. <br />
+When you request Who's That messages to pick, the bot will randomly pick 2 checkpoints from the list, and fetch 100 messages from the checkpoint.  
+Then, the bot will randomly pick 5 messages from each checkpoint, and send them to the picker channel. Take note that the bot will filter messages along the process.
 
 #### 📝 Message filtering
 
-The bot will filter messages that are too short, that contains a link, attachment, embed, contains only an emoji or a discord mention. And obviously, only messages that are from picked users. <br />
+The bot will filter messages that are too short, that contains a link, attachment, embed, contains only an emoji or a discord mention. And obviously, only messages that are from picked users.
 
 ### 🎮 The game & leaderboard
 
-When you pick a message, the bot will send it to the Who's That channel. 
+When you pick a message, the bot will send it to the Who's That channel.  
 This sent message will contain a select with 5 choices (4 random users and the author).
 
-When you pick a user, the bot will check if the user is the correct one. 
+When you pick a user, the bot will check if the user is the correct one.  
 Check above rules for points attribution. 
 
-The leaderboard is accessible on each Who's That message with a button or with `/leaderboard` command.
+The leaderboard is accessible on each Who's That message with a button or with `/leaderboard` command.  
 The leaderboard will show 10 players per page. 
 
 > Because of the fetching system of the bot that request a lot of API calls, I will not provide a public version of the bot. Watch out for large channel fetchs that can cause your application to be banned (I didn't tried fetching more than 200k messages).
