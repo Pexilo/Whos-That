@@ -99,11 +99,14 @@ async function UpdateScore(
   const pointsArray = userData!.points.find(
     (p: pointsArray) => p.guildId === guild!.id
   )!;
+  let totalPoints = 0;
   if (pointsArray) {
     const index = userData!.points.indexOf(pointsArray);
     userData!.points.splice(index, 1);
+    totalPoints = pointsArray.score + gameScore;
+  } else {
+    totalPoints = gameScore;
   }
-  const totalPoints = pointsArray.score + gameScore;
   await UpdateUser(userId, guild!, {
     points: [...userData!.points, { guildId: guild!.id, score: totalPoints }],
   });
