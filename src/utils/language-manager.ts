@@ -2,7 +2,7 @@ import ITranslations from "@models/ITranslations";
 import fs from "fs";
 
 interface Translations {
-  [key: string]: any; // TODO: better typing
+  [key: string]: any;
 }
 
 class LanguageManager {
@@ -23,48 +23,33 @@ class LanguageManager {
   }
 
   getTranslation(key: string, lang: string): string {
-    const translations = this.translations[lang];
-    if (translations && translations[key]) {
-      return translations[key];
-    } else {
-      return this.translations["en"][key];
-    }
+    return this.translations[lang]?.[key] ?? this.translations["en"]?.[key];
   }
 
   getCommandTranslation(lang: string): ITranslations["commands"] {
-    const translations = this.translations[lang];
-    if (translations && translations["commands"]) {
-      return translations["commands"];
-    } else {
-      return this.translations["en"]["commands"];
-    }
+    return (
+      this.translations[lang]?.["commands"] ??
+      this.translations["en"]?.["commands"]
+    );
   }
 
   getInterractionTranslation(lang: string): ITranslations["interactions"] {
-    const translations = this.translations[lang];
-    if (translations && translations["interactions"]) {
-      return translations["interactions"];
-    } else {
-      return this.translations["en"]["interactions"];
-    }
+    return (
+      this.translations[lang]?.["interactions"] ??
+      this.translations["en"]?.["interactions"]
+    );
   }
 
   getEventTranslation(lang: string): ITranslations["events"] {
-    const translations = this.translations[lang];
-    if (translations && translations["events"]) {
-      return translations["events"];
-    } else {
-      return this.translations["en"]["events"];
-    }
+    return (
+      this.translations[lang]?.["events"] ?? this.translations["en"]?.["events"]
+    );
   }
 
   getUtilsTranslation(lang: string): ITranslations["utils"] {
-    const translations = this.translations[lang];
-    if (translations && translations["utils"]) {
-      return translations["utils"];
-    } else {
-      return this.translations["en"]["utils"];
-    }
+    return (
+      this.translations[lang]?.["utils"] ?? this.translations["en"]?.["utils"]
+    );
   }
 
   getAllTranslations(lang: string): Translations {
