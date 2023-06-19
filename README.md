@@ -103,7 +103,7 @@ When you pick a user, the bot will check if the user is the correct one.
 Check above rules for points attribution. 
 
 The leaderboard is accessible on each Who's That message with a button or with `/leaderboard` command.
-The leaderboard will show 10 players per page (depends on same positions). 
+The leaderboard will show 10 players per page. 
 
 > Because of the fetching system of the bot that request a lot of API calls, I will not provide a public version of the bot. Watch out for large channel fetchs that can cause your application to be banned (I didn't tried fetching more than 200k messages).
 
