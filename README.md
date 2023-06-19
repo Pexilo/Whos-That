@@ -60,9 +60,9 @@ _This is subject to change._
 
 <img src="https://github.com/Pexilo/Whos-That/assets/67436391/a6a5e8d6-3e1e-436f-9770-084bc2b9e9e2"  width="500" height="100">
 
-**Target:** channel where to **fetch** messages from. 
-**Picker:** channel where to **pick** message from. 
-**Who's That:** channel where to **send** message to. 
+**Target:** channel where to **fetch** messages from.  
+**Picker:** channel where to **pick** message from.  
+**Who's That:** channel where to **send** message to.  
 
 > Make sure to lock the **Who's That** channel to make it view only to keep it clean, 
 > and make the **Picker** channel private.
