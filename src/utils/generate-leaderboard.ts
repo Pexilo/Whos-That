@@ -157,7 +157,7 @@ async function GetLeaderboard(
         .join("\n")
     )
     .setFooter({
-      text: eval(generateLeaderboard.author),
+      text: eval(generateLeaderboard.footer),
       iconURL: interaction.user.displayAvatarURL(),
     });
 
