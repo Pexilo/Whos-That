@@ -94,6 +94,10 @@ export async function FetchGuild(guild: Guild) {
 export async function FetchUser(userId: string, guild: Guild) {
   const data = await UserData.findOne({ id: userId });
   if (!data) await CreateUser(userId, guild);
+  if (data.guilds.indexOf(guild.id) === -1) {
+    data.guilds.push(guild.id);
+    data.save();
+  }
   return data;
 }
 
