@@ -31,7 +31,7 @@ export default async function SelectUsers(
   const totalPages = Math.ceil(members.length / usersPerPage);
 
   //Change the indexes
-  const updatedIndexes = GetIndexes(
+  let updatedIndexes = GetIndexes(
     currentPageIndex,
     totalPages,
     startIndex,
@@ -100,7 +100,7 @@ export default async function SelectUsers(
     button.deferUpdate();
 
     //Change the indexes
-    const updatedIndexes = GetIndexes(
+    updatedIndexes = GetIndexes(
       currentPageIndex,
       totalPages,
       startIndex,
@@ -149,14 +149,17 @@ function GetIndexes(
   endIndex: number,
   usersPerPage: number
 ) {
+  let newStartIndex = startIndex;
+  let newEndIndex = endIndex;
+
   if (currentPageIndex < 0) {
     currentPageIndex = 0;
   } else if (currentPageIndex >= totalPages) {
     currentPageIndex = totalPages - 1;
   }
 
-  startIndex = currentPageIndex * usersPerPage;
-  endIndex = startIndex + usersPerPage;
+  newStartIndex = currentPageIndex * usersPerPage;
+  newEndIndex = newStartIndex + usersPerPage;
 
-  return { currentPageIndex, startIndex, endIndex };
+  return { currentPageIndex, startIndex: newStartIndex, endIndex: newEndIndex };
 }

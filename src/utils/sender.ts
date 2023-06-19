@@ -78,7 +78,7 @@ export const SendMessageToPickerChannel = async (
   const randMessagesYears = GetMessageYears(randomMessages);
 
   let buttons: ButtonBuilder[] = [];
-  randomMessages.map((message, i) => {
+  randomMessages.forEach((message, i) => {
     buttons.push(
       new ButtonBuilder()
         .setCustomId(`picker_${message.id}_${message.author.id}`)

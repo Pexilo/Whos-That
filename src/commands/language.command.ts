@@ -1,5 +1,5 @@
 import LanguageManager from "@utils/language-manager";
-import { Defer, FetchAndGetLang, UpdateGuild } from "@utils/shortcuts";
+import { Defer, UpdateGuild } from "@utils/shortcuts";
 import {
   ApplicationCommandOptionType,
   type CommandInteraction,
