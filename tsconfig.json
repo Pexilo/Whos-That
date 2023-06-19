@@ -24,12 +24,13 @@
       "@images/*": ["src/images/*"],
       "@models/*": ["src/models/*"],
       "@assets/*": ["src/assets/*"],
+      "@lang/*": ["src/lang/*"],
       "@rootDir": ["./"]
     }
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   },
-  "include": ["src"],
+  "include": ["src", "pm2.config.ts"],
   "exclude": ["node_modules", "cli-config.ts"]
 }

@@ -1,0 +1,85 @@
+{
+  "commands": {
+    "language": {
+      "response": "✅ La langue du bot est désormais définie sur `Français` 🇫🇷."
+    },
+    "setup": {
+      "processed": "`✅ Environ \\`${approxMsgs}\\` messages ont été traités.`",
+      "done": "`🤖 **WhosThat** est maintenant configuré pour envoyer des messages dans <#${whosThatChannel.id}>.\n\n> <#${pickerChannel.id}> vous permettra de choisir parmi 10 messages avec </whosthat:${config.default.SLASH_COMMANDS_IDS.whosthat}>.\n> Assurez-vous de sélectionner le meilleur message à envoyer !`"
+    },
+    "ping": {
+      "title": "Pong !",
+      "fields": [
+        {
+          "name": "Latence du bot"
+        },
+        {
+          "name": "API Discord"
+        }
+      ]
+    },
+    "whosthat": {
+      "noPickableUsers": "`❌ Une erreur s'est produite lors de l'envoi du message. Vérifiez que le bot est configuré correctement.\n\n> N'oubliez pas de configurer </users:${config.default.SLASH_COMMANDS_IDS.users}>`",
+      "response": "`💬 Message envoyé dans <#${guildData.pickerChannel}>`"
+    }
+  },
+  "events": {
+    "clientMissingPermissions": {
+      "response": "`🚫 J'ai besoin de \\`${missing}\\` permission(s) pour exécuter cette commande.`"
+    },
+    "userMissingPermissions": {
+      "response": "`🚫 J'ai besoin de \\`${missing}\\` permission(s) pour exécuter cette commande.`"
+    }
+  },
+  "interactions": {
+    "whosThatMsgBtns": {
+      "refreshResponse": "🔁 Actualisation du sélecteur.",
+      "fetchErr": "❌ Une erreur s'est produite lors de la récupération du message. Veuillez réessayer ultérieurement.",
+      "fetchWTCErr": "❌ Une erreur s'est produite. Impossible de récupérer le whosThatChannel. Veuillez réessayer ultérieurement.",
+      "title": "C'est qui ?",
+      "placeholder": "C'est qui ?",
+      "label": "Classement",
+      "response": "`✅ Message envoyé ${msg.url}`"
+    },
+    "whosThatSelect": {
+      "fetchSourceErr": "❌ Une erreur s'est produite. Impossible de récupérer sourceChannel. Veuillez réessayer ultérieurement.",
+      "fetchMsgErr": "❌ Une erreur s'est produite. Impossible de récupérer le message. Veuillez réessayer ultérieurement.",
+      "alreadyResponded": "`🚫 Vous avez déjà répondu à ce message.\nLa réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}`",
+      "rightAnswerRes": "`✅ Vous avez trouvé la bonne réponse ! La réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}\n\n> \\`+1\\` point de participation\n> \\`+1\\` point de bonne réponse\n> Total : \\`${totalPoints}\\` points`",
+      "wrongAnswerRes": "`❌ Vous avez donné une mauvaise réponse ! La réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}\n\n> \\`+1\\` point de participation\n> Total : \\`${totalPoints}\\` points`"
+    }
+  },
+  "utils": {
+    "fetchMessages": {
+      "pocessing": "`🔄 Traitement de \\`${messagesLength}\\` messages en cours...`"
+    },
+    "generateImage": {
+      "user": "Utilisateur",
+      "dateSpace": 345,
+      "dateFormat": "DD/MM/YYYY"
+    },
+    "generateLeaderboard": {
+      "noUsersErrFR": "❌ Les utilisateurs n'ont pas encore joué à **Who's That**.",
+      "fetchUserErr": "`❌ Une erreur s'est produite lors de la récupération de l'utilisateur. Veuillez vérifier votre configuration avec </setup:${config.default.SLASH_COMMANDS_IDS.setup}> et réessayer ultérieurement.`",
+      "st": "er",
+      "nd": "nd",
+      "rd": "ème",
+      "th": "ème",
+      "point": "point",
+      "points": "points",
+      "author": "`Classement pour ${guildName}`",
+      "footer": "`Page ${currentPage}/${totalPages} | Vous êtes ${userRankText} avec ${userPointsText}.`"
+    },
+    "generateSelectUsers": {
+      "placeholder": "`Faites une sélection ! Page ${currentPageIndex + 1}/${totalPages}`",
+      "response": "`✅ **WhosThat** est maintenant configuré pour envoyer des messages dans <#${guildData.whosThatChannel}>.\nVous pouvez maintenant choisir quels utilisateurs sélectionner avec le menu déroulant ci-dessous.`"
+    },
+    "sender": {
+      "noDataErr": " `❌ Une erreur s'est produite lors de la récupération des données. Veuillez vérifier votre configuration avec </setup:${config.default.SLASH_COMMANDS_IDS.setup}> et réessayer ultérieurement.`",
+      "fetchChannelErr": "❌ Une erreur s'est produite lors de la récupération des chaînes. Veuillez réessayer ultérieurement.",
+      "title": "C'est qui ?",
+      "description": "`Choisissez le message à envoyer dans <#${guildData.whosThatChannel}>`",
+      "footer": "`depuis ${randMessagesYears}`"
+    }
+  }
+}

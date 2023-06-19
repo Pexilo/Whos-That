@@ -7,17 +7,10 @@ const userSchema = new mongoose.Schema({
     default: ["" /* Guild ID */],
   },
   points: {
-    type: Number,
-    default: 0,
+    type: Array,
   },
   whosThatResponded: {
     type: Array,
-    default: [
-      {
-        id: "",
-        correct: false,
-      },
-    ],
   },
 });
 

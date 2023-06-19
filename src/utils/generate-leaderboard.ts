@@ -1,4 +1,5 @@
 import IUser from "@models/IUser";
+import LanguageManager from "@utils/language-manager";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -8,57 +9,91 @@ import {
   ComponentType,
   GuildMember,
 } from "discord.js";
-import { Embed } from "./shortcuts";
+import { Embed, FetchAndGetLang } from "./shortcuts";
 
 type LeaderboardUser = {
   index: number;
   position: number;
   user: GuildMember | undefined;
   points: number;
-  whosThatResponded: { id: string; correct: boolean }[];
+  whosThatResponded: { guildId: string; messageId: string; correct: boolean }[];
 };
-
+type pointsArray = {
+  guildId: string;
+  score: number;
+};
 async function GetLeaderboard(
   usersData: IUser[],
   interaction: ButtonInteraction | CommandInteraction,
   messageId?: string,
   page?: number
 ) {
+  const { guild } = interaction;
+  const guildName = guild!.name;
+  const config = require("src/config.ts");
+
+  const { lang } = await FetchAndGetLang(guild!);
+  const languageManager = new LanguageManager();
+  const generateLeaderboard =
+    languageManager.getUtilsTranslation(lang).generateLeaderboard;
+
   const sortedUsers = usersData
-    .filter((user: { points: number }) => user.points > 0)
+    .filter(
+      (user: { points: pointsArray[] }) =>
+        user.points.length > 0 &&
+        user.points.find((point: pointsArray) => point.guildId === guild!.id)
+    )
     .sort(
-      (a: { points: number }, b: { points: number }) => b.points - a.points
+      (a: { points: pointsArray[] }, b: { points: pointsArray[] }) =>
+        b.points.find((point: pointsArray) => point.guildId === guild!.id)!
+          .score -
+        a.points.find((point: pointsArray) => point.guildId === guild!.id)!
+          .score
     );
+  if (sortedUsers.length === 0)
+    return interaction.editReply({ content: generateLeaderboard.noUsersErr });
 
-  const users = sortedUsers.reduce((acc: any[], user: IUser, index: number) => {
-    const previousUser = sortedUsers[index - 1];
-    const previousPosition = acc[index - 1] ? acc[index - 1].position : -1;
-    const currentUser = user;
+  const users = await sortedUsers.reduce(
+    async (acc: Promise<any[]>, user: IUser, index: number) => {
+      const previousUser = sortedUsers[index - 1];
+      const previousPosition = index > 0 ? (await acc)[index - 1].position : -1;
+      const currentUser = user;
 
-    const userObject = {
-      index: index,
-      position:
-        previousUser && previousUser.points === currentUser.points
-          ? previousPosition
-          : previousPosition + 1,
-      user: interaction.guild!.members.cache.get(user.id),
-      points: user.points,
-      whosThatResponded: user.whosThatResponded.filter(
-        (whosThatResponded: { id: string }) =>
-          whosThatResponded.id === messageId
-      ),
-    };
+      const userObject = {
+        index: index,
+        position:
+          previousUser &&
+          previousUser.points.find(
+            (point: pointsArray) => point.guildId === guild!.id
+          )!.score ===
+            currentUser.points.find(
+              (point: pointsArray) => point.guildId === guild!.id
+            )!.score
+            ? previousPosition
+            : previousPosition + 1,
 
-    return [...acc, userObject];
-  }, []);
+        user: await guild!.members.fetch(user.id),
+        points: user.points.find(
+          (point: pointsArray) => point.guildId === guild!.id
+        )!.score,
+        whosThatResponded: user.whosThatResponded.filter(
+          (whosThatResponded: { messageId: string }) =>
+            whosThatResponded.messageId === messageId
+        ),
+      };
 
-  const user = users.find(
+      return [...(await acc), userObject];
+    },
+    Promise.resolve([])
+  );
+
+  const user: IUser = users.find(
     (user: LeaderboardUser) => user.user?.id === interaction.user.id
   );
 
   if (!user)
     return interaction.editReply({
-      content: "An error occurred. Could not fetch user.",
+      content: eval(generateLeaderboard.fetchUserErr),
     });
 
   const userIndex = users.indexOf(user);
@@ -68,12 +103,12 @@ async function GetLeaderboard(
   const userRankLastDigit = userRankString[userRankString.length - 1];
   const userRankSuffix =
     userRankLastDigit === "1"
-      ? "st"
+      ? generateLeaderboard.st
       : userRankLastDigit === "2"
-      ? "nd"
+      ? generateLeaderboard.nd
       : userRankLastDigit === "3"
-      ? "rd"
-      : "th";
+      ? generateLeaderboard.rd
+      : generateLeaderboard.th;
 
   const rankEmoji = ["🥇", "🥈", "🥉"];
 
@@ -81,22 +116,24 @@ async function GetLeaderboard(
     userRank < 4 ? rankEmoji[userRank - 1] : "🏅"
   } ${userRank}${userRankSuffix}`;
 
-  const userPoints = user.points;
+  const userPoints = users[userIndex].points;
   const userPointsString = userPoints.toString();
   const userPointsLastDigit = userPointsString[userPointsString.length - 1];
-  const userPointsSuffix = userPointsLastDigit === "1" ? "point" : "points";
-
-  const userPointsText = `${userPoints} ${userPointsSuffix}`;
+  const userPointsSuffix =
+    userPointsLastDigit === "1"
+      ? generateLeaderboard.point
+      : generateLeaderboard.points;
 
   // Split users into multiple pages with a page size of 10
   const pageSize = 10;
   const totalPages = Math.ceil(users.length / pageSize);
   const currentPage = page ? page : Math.floor(userIndex / pageSize) + 1;
 
+  const userPointsText = `${userPoints} ${userPointsSuffix}`;
   const embed = Embed()
     .setAuthor({
-      name: `Leaderboard for ${interaction.guild!.name}`,
-      iconURL: interaction.guild!.iconURL()!,
+      name: eval(generateLeaderboard.author),
+      iconURL: guild!.iconURL()!,
     })
     .setDescription(
       users
@@ -107,7 +144,9 @@ async function GetLeaderboard(
               user.position + 1 < 4
                 ? rankEmoji[user.position]
                 : `${user.position + 1}.`
-            } **${user.user?.user}** — \`${user.points}\` points ${
+            } ${user.user?.user} — \`${user.points}\` ${
+              generateLeaderboard.points
+            } ${
               user.whosThatResponded.length > 0
                 ? user.whosThatResponded[0].correct
                   ? "✅"
@@ -118,7 +157,7 @@ async function GetLeaderboard(
         .join("\n")
     )
     .setFooter({
-      text: `Page ${currentPage}/${totalPages} | You are ${userRankText} with ${userPointsText}.`,
+      text: eval(generateLeaderboard.author),
       iconURL: interaction.user.displayAvatarURL(),
     });
 

@@ -1,0 +1,85 @@
+{
+  "commands": {
+    "language": {
+      "response": "✅ The language of the bot is now set to `English` 🇬🇧."
+    },
+    "setup": {
+      "processed": "`✅ Approximately \\`${approxMsgs}\\` messages were processed.`",
+      "done": "`🤖 **WhosThat** is now setup to send messages in <#${whosThatChannel.id}>.\n\n> <#${pickerChannel.id}> will let you pick between 10 messages with </whosthat:${config.default.SLASH_COMMANDS_IDS.whosthat}>.\n> Make sure to select the best message to send!`"
+    },
+    "ping": {
+      "title": "Pong!",
+      "fields": [
+        {
+          "name": "Bot Latency"
+        },
+        {
+          "name": "Discord API"
+        }
+      ]
+    },
+    "whosthat": {
+      "noPickableUsers": "`❌ An error occured while sending the message. Check that the bot is setup correctly.\n\n> Don't forget to setup </users:${config.default.SLASH_COMMANDS_IDS.users}>`",
+      "response": "`💬 Message sent in <#${guildData.pickerChannel}>`"
+    }
+  },
+  "events": {
+    "clientMissingPermissions": {
+      "response": "`🚫 I need \\`${missing}\\` permission(s) to execute this command.`"
+    },
+    "userMissingPermissions": {
+      "response": "`🚫 I need \\`${missing}\\` permission(s) to execute this command.`"
+    }
+  },
+  "interactions": {
+    "whosThatMsgBtns": {
+      "refreshResponse": "🔁 Picker refreshed.",
+      "fetchErr": "❌ An error occured while fetching the message. Please try again later.",
+      "fetchWTCErr": "❌ An error occured. Could not fetch whosThatChannel. Please try again later.",
+      "title": "Whos that?",
+      "placeholder": "Whos that?",
+      "label": "Leaderboard",
+      "response": "`✅ Message sent ${msg.url}`"
+    },
+    "whosThatSelect": {
+      "fetchSourceErr": "❌ An error occured. Could not fetch sourceChannel. Please try again later.",
+      "fetchMsgErr": "❌ An error occured. Could not fetch the message. Please try again later.",
+      "alreadyResponded": "`🚫 You already responded to this message.\nThe response was <@${authorId}>!\n\n> Original message: ${message.url}`",
+      "rightAnswerRes": "`✅ You got it right! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+1\\` participation point\n> \\`+1\\` right answer point\n> Total: \\`${totalPoints}\\` points`",
+      "wrongAnswerRes": "`❌ You got it wrong! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+1\\` participation point\n> Total: \\`${totalPoints}\\` points`"
+    }
+  },
+  "utils": {
+    "fetchMessages": {
+      "pocessing": "`🔄 Processing \\`${messagesLength}\\` messages...`"
+    },
+    "generateImage": {
+      "user": "User",
+      "dateSpace": 275,
+      "dateFormat": "MM/DD/YYYY"
+    },
+    "generateLeaderboard": {
+      "noUsersErr": "❌ The users didn't played **Who's That** yet.",
+      "fetchUserErr": "`❌ An error occured while fetching the user. Please check your configuration with </setup:${config.default.SLASH_COMMANDS_IDS.setup}> and try again later.`",
+      "st": "st",
+      "nd": "nd",
+      "rd": "rd",
+      "th": "th",
+      "point": "point",
+      "author": "`Leaderboard for ${guildName}`",
+      "points": "points",
+      "footer": "`Page ${currentPage}/${totalPages} | You are ${userRankText} with ${userPointsText}.`"
+    },
+    "generateSelectUsers": {
+      "placeholder": "`Make a selection! Page ${currentPageIndex + 1}/${totalPages}`",
+      "response": "`✅ **WhosThat** is now setup to send messages in <#${guildData.whosThatChannel}>.\nYou can now choose wich users to pick from with the select menu below.`"
+    },
+    "sender": {
+      "noDataErr": " `❌ An error occured while fetching the data. Please check your configuration with </setup:${config.default.SLASH_COMMANDS_IDS.setup}> and try again later.`",
+      "fetchChannelErr": "❌ An error occured while fetching the channels. Please try again later.",
+      "title": "Whos that?",
+      "description": "`Pick the message to send to <#${guildData.whosThatChannel}>`",
+      "footer": "`from ${randMessagesYears}`"
+    }
+  }
+}

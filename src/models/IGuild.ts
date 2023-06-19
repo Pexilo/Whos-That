@@ -5,4 +5,5 @@ export default interface Guilds {
   whosThatChannel: string;
   checkpoints: string[];
   pickableUsers: string[];
+  language: string;
 }

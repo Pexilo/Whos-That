@@ -1,10 +1,15 @@
 type WhosThatResponded = {
-  id: string;
+  guildId: string;
+  messageId: string;
   correct: boolean;
+};
+type pointsArray = {
+  guildId: string;
+  score: number;
 };
 export default interface IUser {
   id: string;
   guilds: string[];
-  points: number;
+  points: pointsArray[];
   whosThatResponded: WhosThatResponded[];
 }

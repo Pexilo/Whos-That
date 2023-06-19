@@ -1,4 +1,3 @@
-import { ScheduleFunction } from "@utils/shortcuts";
 import { IntentsBitField, Partials, PermissionFlagsBits } from "discord.js";
 import { ShewenyClient } from "sheweny";
 import config from "./config";
@@ -8,7 +7,11 @@ interface Error {
   reason?: string;
 }
 const client = new ShewenyClient({
-  intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages],
+  intents: [
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.GuildMembers,
+  ],
   partials: [Partials.GuildMember, Partials.Message, Partials.User],
   managers: {
     commands: {
@@ -35,7 +38,7 @@ const client = new ShewenyClient({
       directory: "./interactions/selectmenus",
     },
   },
-  mode: "development", // Change to production for production bot
+  mode: "production",
 });
 
 mongoose
@@ -47,8 +50,8 @@ mongoose
     family: 4,
   })
   .then(() => console.log("✅ MongoDB"))
-  .catch((err: Error) => console.error("❌ MongoDB\n", err.reason));
-
-ScheduleFunction(client);
+  .catch((err: Error) => {
+    throw new Error("❌ MongoDB\n" + err.reason);
+  });
 
 client.login(config.DISCORD_TOKEN);
