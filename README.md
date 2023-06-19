@@ -31,7 +31,7 @@ Pick carefully the best message 😎
 <img src="https://github.com/Pexilo/Whos-That/assets/67436391/006f7dbf-1b68-403b-9f82-c8c8c83f5991"  width="450" height="500">
 
 When typing `/whosthat` you will be prompt with `1` to `10` random messages.
-You can pick your desired message with the corresponding button, or reload messages with the 🔁 button.
+You can pick your desired message with the corresponding button, or reload messages with the 🔁 button.<br />
 The picked message will be sent to the _Who's That_ channel.
 
 ### 2️⃣ Who's That message preview
