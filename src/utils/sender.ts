@@ -41,7 +41,7 @@ export const SendMessageToPickerChannel = async (
     !guildData.sourceChannel ||
     !guildData.pickerChannel ||
     !guildData.whosThatChannel ||
-    !guildData.checkpoints ||
+    guildData.checkpoints.length < 1 ||
     guildData.pickableUsers.length < 1
   ) {
     interaction.editReply({
