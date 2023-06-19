@@ -11,7 +11,7 @@
 
 ##
 
-> Guess who's the message author! Bring life to small discord servers.
+> Guess who's the message author! Bring life to small communities.
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Pexilo_Whos-That&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Pexilo_Whos-That)
 [![wakatime](https://wakatime.com/badge/user/505d5239-8982-443a-af40-f424ba106165/project/c004fcfc-e297-420f-9c3d-24a9f9be469f.svg "Time spent coding the bot")](https://wakatime.com/badge/user/505d5239-8982-443a-af40-f424ba106165/project/c004fcfc-e297-420f-9c3d-24a9f9be469f)
