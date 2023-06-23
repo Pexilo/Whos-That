@@ -175,10 +175,11 @@ object with additional properties. */
           } ${user.user?.user} — \`${user.points}\` ${
             generateLeaderboard.points
           } ${
-            user.whosThatResponded.length > 0 &&
-            user.whosThatResponded[0].correct
-              ? "✅"
-              : "❌"
+            user.whosThatResponded.length > 0
+              ? user.whosThatResponded[0].correct
+                ? "✅"
+                : "❌"
+              : ""
           }`
       )
       .join("\n");
