@@ -18,7 +18,7 @@ type LeaderboardUser = {
   points: number;
   whosThatResponded: { guildId: string; messageId: string; correct: boolean }[];
 };
-type pointsArray = {
+type PointsArray = {
   guildId: string;
   score: number;
 };
@@ -37,22 +37,28 @@ async function GetLeaderboard(
   const generateLeaderboard =
     languageManager.getUtilsTranslation(lang).generateLeaderboard;
 
+  /* This code block is filtering and sorting an array of user data (`usersData`) to create a sorted
+  array of users (`sortedUsers`) who have points in the current guild (`guild`) and then checking if
+  the resulting array is empty. If the array is empty, it returns an error message. */
   const sortedUsers = usersData
-    .filter(
-      (user: { points: pointsArray[] }) =>
-        user.points.length > 0 &&
-        user.points.find((point: pointsArray) => point.guildId === guild!.id)
+    .filter((user: { points: PointsArray[] }) =>
+      user.points.find(
+        (point: PointsArray) => point.guildId === guild!.id && point.score > 0
+      )
     )
     .sort(
-      (a: { points: pointsArray[] }, b: { points: pointsArray[] }) =>
-        b.points.find((point: pointsArray) => point.guildId === guild!.id)!
+      (a: { points: PointsArray[] }, b: { points: PointsArray[] }) =>
+        b.points.find((point: PointsArray) => point.guildId === guild!.id)!
           .score -
-        a.points.find((point: pointsArray) => point.guildId === guild!.id)!
+        a.points.find((point: PointsArray) => point.guildId === guild!.id)!
           .score
     );
   if (sortedUsers.length === 0)
     return interaction.editReply({ content: generateLeaderboard.noUsersErr });
 
+  /* This code block is creating an array of leaderboard users by filtering and sorting the input
+`usersData` array, and then using the `reduce()` method to transform each user object into a new
+object with additional properties. */
   const users = await sortedUsers.reduce(
     async (acc: Promise<any[]>, user: IUser, index: number) => {
       const previousUser = sortedUsers[index - 1];
@@ -64,17 +70,16 @@ async function GetLeaderboard(
         position:
           previousUser &&
           previousUser.points.find(
-            (point: pointsArray) => point.guildId === guild!.id
+            (point: PointsArray) => point.guildId === guild!.id
           )!.score ===
             currentUser.points.find(
-              (point: pointsArray) => point.guildId === guild!.id
+              (point: PointsArray) => point.guildId === guild!.id
             )!.score
             ? previousPosition
             : previousPosition + 1,
-
         user: await guild!.members.fetch(user.id),
         points: user.points.find(
-          (point: pointsArray) => point.guildId === guild!.id
+          (point: PointsArray) => point.guildId === guild!.id
         )!.score,
         whosThatResponded: user.whosThatResponded.filter(
           (whosThatResponded: { messageId: string }) =>
@@ -87,7 +92,7 @@ async function GetLeaderboard(
     Promise.resolve([])
   );
 
-  const user: IUser = users.find(
+  const user: LeaderboardUser = users.find(
     (user: LeaderboardUser) => user.user?.id === interaction.user.id
   );
 
@@ -96,11 +101,15 @@ async function GetLeaderboard(
       content: eval(generateLeaderboard.fetchUserErr),
     });
 
-  const userIndex = users.indexOf(user);
-  const userRank = userIndex + 1;
+  const userIndex = users.findIndex(
+    (user: LeaderboardUser) => user.user?.id === interaction.user.id
+  );
 
-  const userRankString = userRank.toString();
-  const userRankLastDigit = userRankString[userRankString.length - 1];
+  //User rank
+  const userRank = user.position;
+  const userRankToString = userRank.toString();
+  const rankEmoji = ["🥇", "🥈", "🥉"];
+  const userRankLastDigit = userRankToString[userRankToString.length - 1];
   const userRankSuffix =
     userRankLastDigit === "1"
       ? generateLeaderboard.st
@@ -109,14 +118,12 @@ async function GetLeaderboard(
       : userRankLastDigit === "3"
       ? generateLeaderboard.rd
       : generateLeaderboard.th;
-
-  const rankEmoji = ["🥇", "🥈", "🥉"];
-
   const userRankText = `${
     userRank < 4 ? rankEmoji[userRank - 1] : "🏅"
   } ${userRank}${userRankSuffix}`;
 
-  const userPoints = users[userIndex].points;
+  //User points
+  const userPoints = user.points;
   const userPointsString = userPoints.toString();
   const userPointsLastDigit = userPointsString[userPointsString.length - 1];
   const userPointsSuffix =
@@ -130,89 +137,97 @@ async function GetLeaderboard(
   const currentPage = page ? page : Math.floor(userIndex / pageSize) + 1;
 
   const userPointsText = `${userPoints} ${userPointsSuffix}`;
-  const embed = Embed()
-    .setAuthor({
-      name: eval(generateLeaderboard.author),
-      iconURL: guild!.iconURL()!,
-    })
-    .setDescription(
-      users
-        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
-        .map(
-          (user: LeaderboardUser) =>
-            `${
-              user.position + 1 < 4
-                ? rankEmoji[user.position]
-                : `${user.position + 1}.`
-            } ${user.user?.user} — \`${user.points}\` ${
-              generateLeaderboard.points
-            } ${
-              user.whosThatResponded.length > 0
-                ? user.whosThatResponded[0].correct
-                  ? "✅"
-                  : "❌"
-                : ""
-            }`
-        )
-        .join("\n")
-    )
-    .setFooter({
-      text: eval(generateLeaderboard.footer),
-      iconURL: interaction.user.displayAvatarURL(),
+  await UpdateInteraction(users, interaction, currentPage);
+
+  async function UpdateInteraction(
+    users: LeaderboardUser[],
+    interaction: CommandInteraction | ButtonInteraction,
+    currentPage: number
+  ) {
+    const { guild } = interaction;
+
+    // Create pagination buttons
+    const previousButton = new ButtonBuilder()
+      .setCustomId("previous-leaderboard")
+      .setEmoji("◀️")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(currentPage === 1);
+
+    const nextButton = new ButtonBuilder()
+      .setCustomId("next-leaderboard")
+      .setEmoji("▶️")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(currentPage === totalPages);
+
+    const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      previousButton,
+      nextButton
+    );
+
+    const leaderboardDescription = users
+      .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+      .map(
+        (user: LeaderboardUser) =>
+          `${
+            user.position + 1 < 4
+              ? rankEmoji[user.position]
+              : `⠀${user.position + 1}.`
+          } ${user.user?.user} — \`${user.points}\` ${
+            generateLeaderboard.points
+          } ${
+            user.whosThatResponded.length > 0 &&
+            user.whosThatResponded[0].correct
+              ? "✅"
+              : "❌"
+          }`
+      )
+      .join("\n");
+
+    const embed = Embed()
+      .setAuthor({
+        name: eval(generateLeaderboard.author),
+        iconURL: guild!.iconURL()!,
+      })
+      .setDescription(leaderboardDescription)
+      .setFooter({
+        text: eval(generateLeaderboard.footer),
+        iconURL: interaction.user.displayAvatarURL(),
+      });
+
+    const reply = await interaction.editReply({
+      embeds: [embed],
+      components: [buttonRow],
     });
 
-  // Create pagination buttons
-  const previousButton = new ButtonBuilder()
-    .setCustomId("previous-leaderboard")
-    .setEmoji("◀️")
-    .setStyle(ButtonStyle.Secondary)
-    .setDisabled(currentPage === 1);
+    // Create a collector to listen for button interactions
+    const collector = reply.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 60000,
+    });
 
-  const nextButton = new ButtonBuilder()
-    .setCustomId("next-leaderboard")
-    .setEmoji("▶️")
-    .setStyle(ButtonStyle.Secondary)
-    .setDisabled(currentPage === totalPages);
-
-  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    previousButton,
-    nextButton
-  );
-
-  // Send the embed with buttons
-  const reply = await interaction.editReply({
-    embeds: [embed],
-    components: [buttonRow],
-  });
-
-  // Create a collector to listen for button interactions
-  const collector = reply.createMessageComponentCollector({
-    componentType: ComponentType.Button,
-    time: 60000,
-  });
-
-  // Handle button interactions
-  collector.on("collect", async (i: ButtonInteraction) => {
-    if (i.customId === "previous-leaderboard") {
-      // Go to the previous page
-      try {
-        await i.deferUpdate();
-      } catch (error) {}
-      collector.stop();
-      if (currentPage > 1) {
-        GetLeaderboard(usersData, interaction, messageId, currentPage - 1);
+    // Handle button interactions
+    collector.on("collect", async (i: ButtonInteraction) => {
+      if (i.customId === "previous-leaderboard") {
+        // Go to the previous page
+        try {
+          await i.deferUpdate();
+        } catch (error) {}
+        collector.stop();
+        if (currentPage > 1) {
+          UpdateInteraction(users, interaction, currentPage - 1);
+        }
+      } else if (i.customId === "next-leaderboard") {
+        // Go to the next page
+        try {
+          await i.deferUpdate();
+        } catch (error) {}
+        collector.stop();
+        if (currentPage < totalPages) {
+          UpdateInteraction(users, interaction, currentPage + 1);
+        }
       }
-    } else if (i.customId === "next-leaderboard") {
-      // Go to the next page
-      try {
-        await i.deferUpdate();
-      } catch (error) {}
-      collector.stop();
-      if (currentPage < totalPages) {
-        GetLeaderboard(usersData, interaction, messageId, currentPage + 1);
-      }
-    }
-  });
+    });
+  }
 }
 
 export { GetLeaderboard };
