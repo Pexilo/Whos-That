@@ -1,3 +1,4 @@
+import ILeaderboardUser from "@models/ILeaderboardUser";
 import IUser from "@models/IUser";
 import LanguageManager from "@utils/language-manager";
 import {
@@ -7,17 +8,10 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
-  GuildMember,
 } from "discord.js";
 import { Embed, FetchAndGetLang } from "./shortcuts";
+import UserStreak from "./streak-checker";
 
-type LeaderboardUser = {
-  index: number;
-  position: number;
-  user: GuildMember | undefined;
-  points: number;
-  whosThatResponded: { guildId: string; messageId: string; correct: boolean }[];
-};
 type PointsArray = {
   guildId: string;
   score: number;
@@ -65,6 +59,11 @@ object with additional properties. */
       const previousPosition = index > 0 ? (await acc)[index - 1].position : -1;
       const currentUser = user;
 
+      const whosThatGuild = currentUser.whosThatResponded.filter(
+        (whosThatResponded: { guildId: string }) =>
+          whosThatResponded.guildId === guild!.id
+      );
+
       const userObject = {
         index: index,
         position:
@@ -81,6 +80,7 @@ object with additional properties. */
         points: user.points.find(
           (point: PointsArray) => point.guildId === guild!.id
         )!.score,
+        streak: UserStreak(whosThatGuild),
         whosThatResponded: user.whosThatResponded.filter(
           (whosThatResponded: { messageId: string }) =>
             whosThatResponded.messageId === messageId
@@ -92,8 +92,8 @@ object with additional properties. */
     Promise.resolve([])
   );
 
-  const user: LeaderboardUser = users.find(
-    (user: LeaderboardUser) => user.user?.id === interaction.user.id
+  const user: ILeaderboardUser = users.find(
+    (user: ILeaderboardUser) => user.user?.id === interaction.user.id
   );
 
   if (!user)
@@ -102,7 +102,7 @@ object with additional properties. */
     });
 
   const userIndex = users.findIndex(
-    (user: LeaderboardUser) => user.user?.id === interaction.user.id
+    (user: ILeaderboardUser) => user.user?.id === interaction.user.id
   );
 
   //User rank
@@ -140,7 +140,7 @@ object with additional properties. */
   await UpdateInteraction(users, interaction, currentPage);
 
   async function UpdateInteraction(
-    users: LeaderboardUser[],
+    users: ILeaderboardUser[],
     interaction: CommandInteraction | ButtonInteraction,
     currentPage: number
   ) {
@@ -167,14 +167,14 @@ object with additional properties. */
     const leaderboardDescription = users
       .slice((currentPage - 1) * pageSize, currentPage * pageSize)
       .map(
-        (user: LeaderboardUser) =>
+        (user: ILeaderboardUser) =>
           `${
             user.position + 1 < 4
               ? rankEmoji[user.position]
               : `⠀${user.position + 1}.`
-          } ${user.user?.user} — \`${user.points}\` ${
-            generateLeaderboard.points
-          } ${
+          } ${user.user?.user} — ${
+            user.streak > 1 ? "🔥".repeat(user.streak) + " " : ""
+          } \`${user.points}\` ${generateLeaderboard.points} ${
             user.whosThatResponded.length > 0
               ? user.whosThatResponded[0].correct
                 ? "✅"

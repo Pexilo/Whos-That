@@ -6,6 +6,7 @@ import {
   FetchUser,
   UpdateUser,
 } from "@utils/shortcuts";
+import UserStreak from "@utils/streak-checker";
 import { Guild, StringSelectMenuInteraction, TextChannel } from "discord.js";
 import type { ShewenyClient } from "sheweny";
 import { SelectMenu } from "sheweny";
@@ -69,9 +70,10 @@ export class WhosThatSelect extends SelectMenu {
       whosThatResponded: whosthatRes,
     });
     let gameScore = 1; // 1 participation point
+    const userStreak = UserStreak(whosthatRes);
 
     if (authorId === values[0]) {
-      gameScore += 1; // 1 point for correct answer
+      gameScore += 1 * userStreak; // 1 point per correct answer * streak bonus max 3
       const totalPoints = await UpdateScore(
         user.id,
         userData,
