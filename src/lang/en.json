@@ -45,7 +45,7 @@
       "fetchSourceErr": "❌ An error occured. Could not fetch sourceChannel. Please try again later.",
       "fetchMsgErr": "❌ An error occured. Could not fetch the message. Please try again later.",
       "alreadyResponded": "`🚫 You already responded to this message.\nThe response was <@${authorId}>!\n\n> Original message: ${message.url}`",
-      "rightAnswerRes": "`✅ You got it right! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+1\\` participation point\n> \\`+1\\` right answer point\n> Total: \\`${totalPoints}\\` points`",
+      "rightAnswerRes": "`✅ You got it right! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+${gameScore - 1}\\` right answer point(s) ${userStreak > 0 ? '🔥'.repeat(userStreak):''}\n> \\`+1\\` participation point\n> Total: \\`${totalPoints}\\` points`",
       "wrongAnswerRes": "`❌ You got it wrong! The response was <@${authorId}>!\n\n> Original message: ${message.url}\n\n> \\`+1\\` participation point\n> Total: \\`${totalPoints}\\` points`"
     }
   },

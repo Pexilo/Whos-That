@@ -45,7 +45,7 @@
       "fetchSourceErr": "❌ Une erreur s'est produite. Impossible de récupérer sourceChannel. Veuillez réessayer ultérieurement.",
       "fetchMsgErr": "❌ Une erreur s'est produite. Impossible de récupérer le message. Veuillez réessayer ultérieurement.",
       "alreadyResponded": "`🚫 Vous avez déjà répondu à ce message.\nLa réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}`",
-      "rightAnswerRes": "`✅ Vous avez trouvé la bonne réponse ! La réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}\n\n> \\`+1\\` point de participation\n> \\`+1\\` point de bonne réponse\n> Total : \\`${totalPoints}\\` points`",
+      "rightAnswerRes": "`✅ Vous avez trouvé la bonne réponse ! La réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}\n\n> \\`+${gameScore - 1}\\` point(s) de bonne réponse ${userStreak > 0 ? '🔥'.repeat(userStreak):''}\n> \\`+1\\` point de participation\n> Total : \\`${totalPoints}\\` points`",
       "wrongAnswerRes": "`❌ Vous avez donné une mauvaise réponse ! La réponse était <@${authorId}> !\n\n> Message d'origine : ${message.url}\n\n> \\`+1\\` point de participation\n> Total : \\`${totalPoints}\\` points`"
     }
   },
@@ -62,7 +62,7 @@
       "noUsersErrFR": "❌ Les utilisateurs n'ont pas encore joué à **Who's That**.",
       "fetchUserErr": "`❌ Une erreur s'est produite lors de la récupération de l'utilisateur. Veuillez vérifier votre configuration avec </setup:${config.default.SLASH_COMMANDS_IDS.setup}> et réessayer ultérieurement.`",
       "st": "er",
-      "nd": "nd",
+      "nd": "ème",
       "rd": "ème",
       "th": "ème",
       "point": "point",
