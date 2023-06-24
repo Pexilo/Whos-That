@@ -2,7 +2,7 @@
 <div align="center">
 <img src="https://github.com/Pexilo/Whos-That/assets/67436391/fa031cc9-d9f5-4538-8a49-64df39791eca" align="center">
   <a href="https://github.com/Pexilo/Whos-That/releases" target="_blank">
-    <img alt="Version" src="https://img.shields.io/badge/version-1.0.1-yellow.svg?cacheSeconds=2592000&style=for-the-badge" />
+    <img alt="Version" src="https://img.shields.io/badge/version-1.1.0-yellow.svg?cacheSeconds=2592000&style=for-the-badge" />
   </a>
   <a href="https://github.com/Pexilo/Whos-That/blob/main/LICENSE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" />
