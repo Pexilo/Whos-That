@@ -106,7 +106,7 @@ object with additional properties. */
   );
 
   //User rank
-  const userRank = user.position;
+  const userRank = user.position + 1;
   const userRankToString = userRank.toString();
   const rankEmoji = ["🥇", "🥈", "🥉"];
   const userRankLastDigit = userRankToString[userRankToString.length - 1];
