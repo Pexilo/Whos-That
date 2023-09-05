@@ -10,5 +10,5 @@ package-lock.json
 dist/
 *.sqlite
 .vscode/settings.json
-src/history/*
+src/history/*.png
 .env.save
