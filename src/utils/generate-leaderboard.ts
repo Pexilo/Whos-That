@@ -50,6 +50,14 @@ async function GetLeaderboard(
   if (sortedUsers.length === 0)
     return interaction.editReply({ content: generateLeaderboard.noUsersErr });
 
+  const fetchUser = async (user: IUser) => {
+    try {
+      return await guild!.members.fetch(user.id);
+    } catch (error) {
+      return null;
+    }
+  };
+
   /* This code block is creating an array of leaderboard users by filtering and sorting the input
 `usersData` array, and then using the `reduce()` method to transform each user object into a new
 object with additional properties. */
@@ -76,7 +84,7 @@ object with additional properties. */
             )!.score
             ? previousPosition
             : previousPosition + 1,
-        user: await guild!.members.fetch(user.id),
+        user: await fetchUser(user),
         points: user.points.find(
           (point: PointsArray) => point.guildId === guild!.id
         )!.score,
@@ -166,6 +174,7 @@ object with additional properties. */
 
     const leaderboardDescription = users
       .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+      .filter((user: ILeaderboardUser) => user.user)
       .map(
         (user: ILeaderboardUser) =>
           `${
