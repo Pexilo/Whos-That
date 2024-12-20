@@ -7,6 +7,7 @@ import {
   GuildMember,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
+  TextChannel,
 } from "discord.js";
 import LanguageManager from "./language-manager";
 import { FetchAndGetLang } from "./shortcuts";
@@ -82,10 +83,11 @@ export default async function SelectUsers(
   });
 
   //Create a collector for the buttons
-  const collector = interaction.channel!.createMessageComponentCollector({
-    componentType: ComponentType.Button,
-    time: 60000,
-  });
+  const collector =
+    (interaction.channel as TextChannel)!.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 300000,
+    });
 
   //Manage events
   collector.on("collect", async (button) => {

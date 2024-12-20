@@ -212,7 +212,7 @@ object with additional properties. */
     // Create a collector to listen for button interactions
     const collector = reply.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 60000,
+      time: 300000,
     });
 
     // Handle button interactions
