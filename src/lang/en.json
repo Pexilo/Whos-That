@@ -4,6 +4,7 @@
       "response": "✅ The language of the bot is now set to `English` 🇬🇧."
     },
     "setup": {
+      "processing": "`🔄 Processing this takes around \\`1 hour\\` to fetch \\`100 000 messages\\`. Please be patient...",
       "processed": "`✅ Approximately \\`${approxMsgs}\\` messages were processed.`",
       "done": "`🤖 **WhosThat** is now setup to send messages in <#${whosThatChannel.id}>.\n\n> <#${pickerChannel.id}> will let you pick between 10 messages with </whosthat:${config.default.SLASH_COMMANDS_IDS.whosthat}>.\n> Make sure to select the best message to send!`"
     },
@@ -50,9 +51,6 @@
     }
   },
   "utils": {
-    "fetchMessages": {
-      "pocessing": "`🔄 Processing \\`${messagesLength}\\` messages...`"
-    },
     "generateImage": {
       "user": "User",
       "dateSpace": 275,

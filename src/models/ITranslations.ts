@@ -5,6 +5,7 @@ export default interface ITranslations {
       response: string;
     };
     setup: {
+      processing: string;
       processed: string;
       done: string;
     };
@@ -49,9 +50,6 @@ export default interface ITranslations {
     };
   };
   utils: {
-    fetchMessages: {
-      pocessing: string;
-    };
     generateImage: {
       user: string;
       dateSpace: number;
