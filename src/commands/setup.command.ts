@@ -58,6 +58,15 @@ export class WhosThatSetupCommand extends Command {
           },
           required: true,
         },
+        {
+          type: ApplicationCommandOptionType.Boolean,
+          name: "fetch-again",
+          description: "🎨 Fetch the messages from target channel again",
+          descriptionLocalizations: {
+            fr: "🎨 Récupérer les messages du canal cible à nouveau",
+          },
+          required: false,
+        },
       ],
       clientPermissions: ["ViewChannel", "SendMessages", "EmbedLinks"],
       userPermissions: ["ManageGuild"],
@@ -71,23 +80,32 @@ export class WhosThatSetupCommand extends Command {
     const sourceChannel = options.get("target")!.channel as TextChannel;
     const pickerChannel = options.get("picker")!.channel as TextChannel;
     const whosThatChannel = options.get("whosthat")!.channel as TextChannel;
+    const fetchAgain = options.get("fetch-again")?.value as boolean;
 
     const languageManager = new LanguageManager();
     const setup = languageManager.getCommandTranslation(lang).setup;
     const config = require("src/config.ts");
 
-    if (guildData?.checkpoints?.length === 0) {
-      const approxMsgs =
-        (await fetchChannelCheckpoints(
+    if (guildData?.checkpoints?.length === 0 || fetchAgain) {
+      interaction.editReply({
+        content: setup.processing,
+      });
+
+      let checkpointCount: number | undefined;
+      do {
+        checkpointCount = await fetchChannelCheckpoints(
           sourceChannel,
           guild!,
           interaction,
           lang
-        )) * 100;
+        );
+      } while (checkpointCount === undefined);
 
-      interaction.editReply({
+      const approxMsgs = checkpointCount! * 100;
+      pickerChannel.send({
         content: eval(setup.processed),
       });
+
       guildData = await FetchGuild(guild!);
     }
 

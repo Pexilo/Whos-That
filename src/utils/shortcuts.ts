@@ -115,6 +115,21 @@ export async function UpdateGuild(guild: Guild, data: any) {
   return guildData.save();
 }
 
+export async function IncrementGuildData(guild: Guild, data: any) {
+  const guildData = await FetchGuild(guild);
+  if (typeof data !== "object") return;
+  for (const key in data) {
+    if (typeof guildData[key] === "number" && typeof data[key] === "number") {
+      guildData[key] += data[key];
+    } else if (Array.isArray(guildData[key]) && Array.isArray(data[key])) {
+      guildData[key] = guildData[key].concat(data[key]);
+    } else {
+      guildData[key] = data[key];
+    }
+  }
+  return guildData.save();
+}
+
 export async function UpdateUser(userId: string, guild: Guild, data: any) {
   const userData = await FetchUser(userId, guild);
   if (typeof data !== "object") return;
